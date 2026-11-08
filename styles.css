@@ -81,3 +81,13 @@ footer small{color:#77705f}
  .creator-card,.article-card,.panel{border-radius:8px}
  .age-card{padding:36px 25px}
 }
+
+/* Gold star accents */
+.hero-art:after{content:"✦  ✧  ✦";position:absolute;top:22px;right:26px;color:#f4d47e;letter-spacing:.45em;font-size:20px;text-shadow:0 0 8px #f6d879aa,0 0 24px #d8b45e66;pointer-events:none;animation:starGlow 3.8s ease-in-out infinite}
+.hero-emblem{position:relative}.hero-emblem:after{content:"✦";position:absolute;top:-20px;right:-22px;font-size:30px;color:#ffe7a0;text-shadow:0 0 12px #f6d879,0 0 30px #d8b45e;transform:rotate(12deg)}
+.brand-mark:after{content:" ✦";font-size:.48em;vertical-align:top;color:#ffe7a0;text-shadow:0 0 10px #e4bd62}
+.section-heading h2:after{content:" ✧";font-family:serif;font-size:.62em;color:#e8c777;text-shadow:0 0 14px #d8b45e88}
+.creator-card,.article-card{position:relative;overflow:hidden}.creator-card:before,.article-card:before{content:"✦";position:absolute;top:16px;right:18px;color:#d9b65e;font-size:12px;opacity:.72;text-shadow:0 0 10px #d8b45e66}
+.stats-strip strong:before{content:"✦ ";font-size:.65em;color:#f3d47c}
+@keyframes starGlow{0%,100%{opacity:.55;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.35)}}
+@media(prefers-reduced-motion:reduce){.hero-art:after{animation:none}}
