@@ -102,11 +102,21 @@
     $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+escapeHtml(m.moderation_status||"pending")+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
   }
   $("#profileForm").addEventListener("submit",async e=>{
-    e.preventDefault();if(!sb||!currentUser)return;
+    e.preventDefault();
+    const button=e.currentTarget.querySelector('button[type="submit"]');
+    if(!sb||!currentUser){msg("#profileMessage","Please sign in again before saving your profile.",true);return;}
     const row={id:currentUser.id,display_name:$("#displayName").value.trim(),bio:$("#bio").value.trim(),country:$("#country").value.trim()};
-    const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
-    msg("#profileMessage",error?error.message:"Profile saved. It will be publicly visible only after approval.",!!error);
-    if(!error)await loadCreators();
+    if(!row.display_name){msg("#profileMessage","Please enter a display name.",true);return;}
+    button.disabled=true;button.textContent="Saving…";msg("#profileMessage","Saving your profile…");
+    try{
+      const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
+      if(error) throw error;
+      msg("#profileMessage","Profile saved successfully. It will appear publicly after review.");
+      await loadCreators();
+    }catch(error){
+      console.error("Profile save failed:",error);
+      msg("#profileMessage",error.message||"Could not save profile. Please try again.",true);
+    }finally{button.disabled=false;button.textContent="Save profile";}
   });
   $("#tierForm").addEventListener("submit",async e=>{
     e.preventDefault();if(!sb||!currentUser)return;
