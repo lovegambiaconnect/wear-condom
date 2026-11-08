@@ -1,17 +1,26 @@
 # WEAR CONDOM
 
-Independent black-and-gold premium 18+ creator and sexual-wellness platform landing page.
+Standalone 18+ creator community and sexual-wellness starter site.
 
-## Current scope
-- Responsive static landing page with luxury black/gold styling.
-- Front-end 18+ confirmation interstitial (not legally sufficient age verification).
-- Creator-interest and launch-update placeholders.
-- Safety principles and pre-launch legal checklist.
+## Separate backend
+- Supabase project: `cxqijbdtcaqyttbfzqds`
+- Public tables used: `adult_creator_profiles`, `adult_creator_media`, `adult_subscription_tiers`, `adult_subscriptions`, `adult_wellness_articles`
+- This project is separate from Love Gambia Connect.
 
-## Important before launch
-This is a visual starter, not a complete adult-content hosting or monetization platform. It does not provide account registration, identity/age verification, uploads, payments, subscriptions, moderation tooling, or ad integrations. Do not enable user uploads or publish adult content until robust age and identity assurance, documented consent and content-rights checks, reporting/takedown workflows, privacy/security controls, payment-provider approval, and jurisdiction-specific legal review are implemented. Never permit minors, coercion, trafficking, non-consensual intimate imagery, hidden-camera material, or other unlawful content.
+## Supabase browser configuration
+Edit `config.js` and replace `PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE` with the project's **anon/public** key. Never use the `service_role` key in browser code. The public key is safe to expose only when Row Level Security and policies are correctly configured.
 
-Replace example email addresses ending in .example before launch. Add a privacy notice, terms, cookie notice, community guidelines, creator agreement and refund policy drafted for the operating jurisdictions.
+## Features
+- 18+ entry self-attestation
+- Email/password registration and sign-in through Supabase Auth
+- Creator profile editing
+- Creator membership tier drafts (inactive; no payments)
+- Creator media-link submissions with consent declaration and moderation status
+- Approved creator discovery and wellness resource listing
 
-## Deploy
-Static site. Configure Vercel with repository root as project root, no build command, and output directory as dot.
+## Important launch checks
+- Configure robust age assurance appropriate to jurisdictions served.
+- Confirm RLS policies, storage access, and all five table schemas.
+- Add reporting, blocking, moderation operations, privacy policy, terms and a support contact.
+- Integrate a compliant payment provider before enabling paid memberships.
+- The age gate is not identity or age verification.
