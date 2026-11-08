@@ -50,6 +50,8 @@
       }else{
         result=await sb.auth.signInWithPassword({email,password});
         if(result.error) throw result.error;
+        // Ensure members who confirmed email after registration receive their creator profile row.
+        if(result.data.user) await ensureProfile(result.data.user, result.data.user.user_metadata?.display_name || result.data.user.email?.split("@")[0] || "New creator");
         $("#authModal").classList.add("hidden");toast("Welcome back.");
       }
     }catch(err){msg("#authMessage",err.message||"Something went wrong. Please try again.",true);}
