@@ -11,9 +11,19 @@
   const msg = (id, text, error=false) => { const el=$(id); if(el){el.textContent=text;el.style.color=error?"#e6a18f":"var(--gold)";} };
 
   // Age gate is a front-door self-attestation, not legal identity verification.
-  if (sessionStorage.getItem("wc_age_ok")==="yes") $("#ageGate").classList.add("dismissed");
-  $("#ageConfirm").addEventListener("change",e=>$("#enterSite").disabled=!e.target.checked);
-  $("#enterSite").addEventListener("click",()=>{sessionStorage.setItem("wc_age_ok","yes");$("#ageGate").classList.add("dismissed");});
+  const ageGate = $("#ageGate"), ageConfirm = $("#ageConfirm"), enterSite = $("#enterSite");
+  const dismissAgeGate = () => {
+    ageGate.classList.add("dismissed");
+    ageGate.style.display = "none";
+    try { sessionStorage.setItem("wc_age_ok", "yes"); } catch (_) {}
+  };
+  try { if (sessionStorage.getItem("wc_age_ok") === "yes") dismissAgeGate(); } catch (_) {}
+  ageConfirm.addEventListener("change", () => { enterSite.disabled = !ageConfirm.checked; });
+  enterSite.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (!ageConfirm.checked) return;
+    dismissAgeGate();
+  });
   $("#leaveSite").addEventListener("click",()=>{document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:30px;color:#ddd;font-family:Arial"><div><h1>Access unavailable</h1><p>This community is for adults aged 18 and over.</p></div></main>';});
 
   function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account ↗":"Sign in ↗"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
