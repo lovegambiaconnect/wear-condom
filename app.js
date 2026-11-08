@@ -16,6 +16,15 @@
     ageGate.classList.add("dismissed");
     ageGate.style.display = "none";
     try { sessionStorage.setItem("wc_age_ok", "yes"); } catch (_) {}
+    // Load the Adsterra placement only after the visitor passes the 18+ entry screen.
+    if (!document.getElementById("adsterra-unit-script")) {
+      const adScript = document.createElement("script");
+      adScript.id = "adsterra-unit-script";
+      adScript.async = true;
+      adScript.setAttribute("data-cfasync", "false");
+      adScript.src = "https://bicea.org/21/3b75889ba2efffde3170f74c6ed3e4e6";
+      document.body.appendChild(adScript);
+    }
   };
   try { if (sessionStorage.getItem("wc_age_ok") === "yes") dismissAgeGate(); } catch (_) {}
   ageConfirm.addEventListener("change", () => { enterSite.disabled = !ageConfirm.checked; });
