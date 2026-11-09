@@ -112,7 +112,7 @@
 <script>
   document.addEventListener('DOMContentLoaded',()=>{if(window.lucide)lucide.createIcons();
     const auth=()=>document.getElementById('joinTop')?.click();
-    ['chatJoin','trendingUpload','trendingUploadBottom'].forEach(id=>document.getElementById(id)?.addEventListener('click',auth));
+['chatJoin'].forEach(id=>document.getElementById(id)?.addEventListener('click',auth));
     document.getElementById('openSettings')?.addEventListener('click',auth);
     document.getElementById('streamSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('streamSearchInput').value.trim().toLowerCase();const cards=[...document.querySelectorAll('.video-empty-card,.creator-card')];let found=0;cards.forEach(c=>{const ok=!q||c.textContent.toLowerCase().includes(q);c.style.display=ok?'':'none';if(ok)found++;});if(q&&!found)document.getElementById('streamSearchInput').placeholder='No matching published content yet';});
     document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');}));
