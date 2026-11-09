@@ -112,9 +112,12 @@
   });
 
   async function loadSession(){
-    if(!sb){$("#creatorGrid").innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';return;}
-    const {data}=await sb.auth.getSession(); currentUser=data.session?.user||null; updateAuthUI();
+    if(!sb){$('#creatorGrid').innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';return;}
+    // Subscribe before reading the persisted session so INITIAL_SESSION/auth events cannot be missed.
     sb.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;updateAuthUI();});
+    const {data,error}=await sb.auth.getSession();
+    if(error) console.warn('Session restore check:',error.message);
+    currentUser=data?.session?.user||null; updateAuthUI();
     await loadCreators(); await loadArticles();
   }
   function updateAuthUI(){
