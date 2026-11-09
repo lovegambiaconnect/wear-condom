@@ -147,12 +147,13 @@
   }
   async function openDashboard(){
     if(!sb){showAuth("signin");return;}
-    // Refresh the persisted Supabase session before routing; a delayed page auth event
-    // must not send an already-signed-in creator back to registration.
-    const {data,error}=await sb.auth.getSession();
-    if(error){toast("Could not restore your session. Please try again.");return;}
-    currentUser=data.session?.user||null;
-    updateAuthUI();
+    // Upload buttons should navigate using the already-restored signed-in user,
+    // not trigger another session lookup that can race with auth events.
+    if(!currentUser){
+      const {data,error}=await sb.auth.getSession();
+      if(error){toast("Could not restore your session. Please try again.");return;}
+      currentUser=data?.session?.user||null;
+    }
     if(!currentUser){showAuth("signin");return;}
     $("#authModal").classList.add("hidden");
     $("#dashboard").classList.remove("hidden");
