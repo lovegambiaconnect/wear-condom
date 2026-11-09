@@ -99,13 +99,13 @@
     const checks={}; card.querySelectorAll("input[data-field]").forEach(input=>checks[input.dataset.field]=input.checked);
     if(action==="approve"&&!(checks.is_adult_verified&&checks.identity_verified&&checks.consent_reviewed)){msg("#adminMessage","Approval blocked: all age, identity and consent checks must be complete.",true);return;}
     button.disabled=true;
-    let update;
-    if(action==="save-checks") update=checks;
-    if(action==="approve") update={...checks,is_approved:true,moderation_status:"approved"};
-    if(action==="reject") update={is_approved:false,moderation_status:"rejected"};
-    const {error}=await sb.from("adult_creator_profiles").update(update).eq("id",id);
+    const {data,error}=await sb.rpc("admin_review_creator",{
+      p_creator_id:id,p_action:action,
+      p_age:checks.is_adult_verified,p_identity:checks.identity_verified,p_consent:checks.consent_reviewed
+    });
     if(error){msg("#adminMessage",error.message,true);button.disabled=false;return;}
-    msg("#adminMessage",action==="approve"?"Creator approved. Upload access is now enabled subject to storage rules.":action==="reject"?"Application rejected.":"Verification checks saved.");
+    if(!data){msg("#adminMessage","No creator row was returned. Nothing was changed.",true);button.disabled=false;return;}
+    msg("#adminMessage",action==="approve"?"Creator approved and saved in Supabase.":action==="reject"?"Application rejection saved.":"Verification checks saved in Supabase.");
     await loadAdminQueue(); await loadCreators();
   });
 
