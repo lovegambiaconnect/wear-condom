@@ -88,10 +88,14 @@
   }
   async function loadCreators(){
     const grid=$("#creatorGrid");
-    const {data,error}=await sb.from("adult_creator_profiles").select("id,display_name,bio,country,avatar_path,moderation_status,is_adult_verified,identity_verified,consent_reviewed").limit(12);
-    if(error){grid.innerHTML='<div class="empty-state">Creator profiles will appear here once approved and the public profile policy is enabled.</div>';return;}
+    const {data,error}=await sb.from("adult_creator_profiles").select("id,display_name,bio,country,avatar_url,moderation_status,is_adult_verified,identity_verified,consent_reviewed").limit(12);
+    if(error){console.warn("Could not load approved creator profiles:",error);return;}
     const rows=(data||[]).filter(x=>x.moderation_status==="approved"&&x.is_adult_verified===true&&x.identity_verified===true&&x.consent_reviewed===true);
-    grid.innerHTML=rows.length?rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>✓ APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join(""):'<div class="empty-state">No approved creator profiles to show yet. Be the first to create a profile.</div>';
+    if(rows.length){
+      const demoCards=grid.querySelectorAll('.demo-card');
+      demoCards.forEach(card=>card.remove());
+      grid.insertAdjacentHTML('afterbegin',rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>✓ APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join(""));
+    }
   }
   async function loadArticles(){
     const {data,error}=await sb.from("adult_wellness_articles").select("*").limit(6);
