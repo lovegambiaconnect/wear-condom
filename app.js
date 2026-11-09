@@ -92,9 +92,9 @@
     if(error){console.warn("Could not load approved creator profiles:",error);return;}
     const rows=(data||[]).filter(x=>x.moderation_status==="approved"&&x.is_adult_verified===true&&x.identity_verified===true&&x.consent_reviewed===true);
     if(rows.length){
-      const demoCards=grid.querySelectorAll('.demo-card');
-      demoCards.forEach(card=>card.remove());
-      grid.insertAdjacentHTML('afterbegin',rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>✓ APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join(""));
+      grid.innerHTML=rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>✓ APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join("");
+    }else{
+      grid.innerHTML='<div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div>';
     }
   }
   async function loadArticles(){
