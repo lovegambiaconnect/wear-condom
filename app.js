@@ -69,7 +69,8 @@
   });
 
   async function ensureProfile(user,displayName){
-    const row={id:user.id,display_name:displayName||user.user_metadata?.display_name||"New creator"};
+    const isOwner=(user.email||"").toLowerCase()==="joebeneth9@gmail.com";
+    const row={id:user.id,display_name:isOwner?"Wildcat":(displayName||user.user_metadata?.display_name||"New creator")};
     const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
     if(error) throw error;
   }
