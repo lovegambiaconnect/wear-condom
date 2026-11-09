@@ -229,3 +229,25 @@ begin
     alter publication supabase_realtime add table public.live_chat_messages;
   end if;
 end $$;
+
+
+-- Harden stream state: only trusted server functions/webhooks may create or publish streams.
+drop policy if exists "Creators can create their own live stream" on public.live_streams;
+drop policy if exists "Creators can update their own live stream" on public.live_streams;
+revoke insert, update, delete on public.live_streams from anon, authenticated;
+
+-- Require all adult, identity and consent checks before a member can post chat.
+drop policy if exists "Signed-in adults can post chat" on public.live_chat_messages;
+create policy "Signed-in approved adults can post chat"
+on public.live_chat_messages for insert to authenticated
+with check (
+  user_id = auth.uid()
+  and exists (
+    select 1 from public.adult_creator_profiles p
+    where p.id = auth.uid()
+      and p.is_adult_verified = true
+      and p.identity_verified = true
+      and p.consent_reviewed = true
+      and p.moderation_status = 'approved'
+  )
+);
