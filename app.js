@@ -136,12 +136,32 @@
   });
   $("#mediaForm").addEventListener("submit",async e=>{
     e.preventDefault();if(!sb||!currentUser)return;
-    const f=new FormData(e.currentTarget);
-    const {error}=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,storage_path:String(f.get("media_url")).trim(),media_type:String(f.get("media_type")),consent_confirmed:true});
-    msg("#mediaMessage",error?error.message:"Submission received and awaiting moderation.",!!error);
-    if(!error){e.currentTarget.reset();loadDashboard();}
+    const form=e.currentTarget, f=new FormData(form), file=f.get("media_file");
+    if(!(file instanceof File)||!file.size){msg("#mediaMessage","Choose a video file first.",true);return;}
+    const allowed=["video/mp4","video/webm","video/quicktime"];
+    if(!allowed.includes(file.type)){msg("#mediaMessage","Please choose an MP4, WebM or MOV video.",true);return;}
+    if(file.size>50*1024*1024){msg("#mediaMessage","This file is larger than 50 MB. Please choose a smaller video.",true);return;}
+    if(f.get("consent")!=="on"){msg("#mediaMessage","Confirm ownership and documented consent before uploading.",true);return;}
+    const {data:profile,error:profileError}=await sb.from("adult_creator_profiles").select("is_adult_verified,identity_verified,consent_reviewed,moderation_status").eq("id",currentUser.id).maybeSingle();
+    if(profileError){msg("#mediaMessage",profileError.message,true);return;}
+    if(!profile||profile.is_adult_verified!==true||profile.identity_verified!==true||profile.consent_reviewed!==true||profile.moderation_status!=="approved"){
+      msg("#mediaMessage","Video uploads unlock after an administrator verifies your age, identity and consent documentation and approves your creator account.",true);return;
+    }
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100);
+    const path=currentUser.id+"/"+Date.now()+"-"+safeName;
+    const button=form.querySelector('button[type="submit"]');button.disabled=true;button.textContent="Uploading…";
+    try{
+      const upload=await sb.storage.from("creator-videos").upload(path,file,{contentType:file.type,upsert:false});
+      if(upload.error)throw upload.error;
+      const saved=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,storage_path:path,media_type:"video",consent_confirmed:true});
+      if(saved.error){await sb.storage.from("creator-videos").remove([path]);throw saved.error;}
+      msg("#mediaMessage","Video uploaded privately. It is pending moderation and is not public.");form.reset();await loadDashboard();
+    }catch(error){msg("#mediaMessage",error.message||"Upload failed. Please try again.",true);}
+    finally{button.disabled=false;button.textContent="Upload privately for review";}
   });
   $("#signOut").addEventListener("click",async()=>{if(sb)await sb.auth.signOut();currentUser=null;updateAuthUI();toast("You have signed out.");});
   function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
   loadSession();
+  const requestedAuth = new URLSearchParams(window.location.search).get("auth");
+  if (requestedAuth === "signup" || requestedAuth === "signin") showAuth(requestedAuth);
 })();
