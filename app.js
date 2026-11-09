@@ -35,7 +35,7 @@
   });
   $("#leaveSite").addEventListener("click",()=>{document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:30px;color:#ddd;font-family:Arial"><div><h1>Access unavailable</h1><p>This community is for adults aged 18 and over.</p></div></main>';});
 
-  function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account â":"Sign in â"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
+  function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account":"Sign in"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
   ["#openAuth","#joinTop"].forEach(s=>$(s).addEventListener("click",()=>showAuth("signup")));
   ["#creatorJoin","#videoJoin","#trendingUpload","#trendingUploadBottom"].forEach(selector=>{
     const button=$(selector);
@@ -50,7 +50,7 @@
     if(!sb){msg("#authMessage","Supabase is not connected yet. Add the project's public anon key in config.js.",true);return;}
     const email=$("#authEmail").value.trim(), password=$("#authPassword").value, name=$("#authName").value.trim();
     if(authMode==="signup"&&!$("#adultCheckbox").checked){msg("#authMessage","Please confirm that you are 18 or older.",true);return;}
-    $("#authSubmit").disabled=true; msg("#authMessage",authMode==="signup"?"Creating your accountâ¦":"Signing you inâ¦");
+    $("#authSubmit").disabled=true; msg("#authMessage",authMode==="signup"?"Creating your account...":"Signing you inâ¦");
     try{
       let result;
       if(authMode==="signup"){
@@ -114,7 +114,7 @@
   async function loadSession(){
     if(!sb){$('#creatorGrid').innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';return;}
     // Subscribe before reading the persisted session so INITIAL_SESSION/auth events cannot be missed.
-    sb.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;updateAuthUI();});
+    sb.auth.onAuthStateChange((event,session)=>{if(session?.user){currentUser=session.user;updateAuthUI();}else if(event==="SIGNED_OUT"){currentUser=null;updateAuthUI();}});
     const {data,error}=await sb.auth.getSession();
     if(error) console.warn('Session restore check:',error.message);
     currentUser=data?.session?.user||null; updateAuthUI();
