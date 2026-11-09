@@ -5,6 +5,8 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   let currentUser = null, authMode = "signup", toastTimer;
+  let resolveAuthReady;
+  const authReadyPromise = new Promise(resolve => { resolveAuthReady = resolve; });
 
   $("#year").textContent = new Date().getFullYear();
   const toast = (msg) => { const el=$("#toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),3200); };
@@ -112,12 +114,15 @@
   });
 
   async function loadSession(){
-    if(!sb){$('#creatorGrid').innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';return;}
+    if(!sb){$('#creatorGrid').innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';resolveAuthReady();return;}
     // Subscribe before reading the persisted session so INITIAL_SESSION/auth events cannot be missed.
     sb.auth.onAuthStateChange((event,session)=>{if(session?.user){currentUser=session.user;updateAuthUI();}else if(event==="SIGNED_OUT"){currentUser=null;updateAuthUI();}});
     const {data,error}=await sb.auth.getSession();
     if(error) console.warn('Session restore check:',error.message);
-    currentUser=data?.session?.user||null; updateAuthUI();
+    // Do not overwrite a valid user delivered by the auth listener with a transient null restore result.
+    if(data?.session?.user) currentUser=data.session.user;
+    updateAuthUI();
+    resolveAuthReady();
     await loadCreators(); await loadArticles();
   }
   function updateAuthUI(){
@@ -147,12 +152,12 @@
   }
   async function openDashboard(){
     if(!sb){showAuth("signin");return;}
-    // Upload buttons should navigate using the already-restored signed-in user,
-    // not trigger another session lookup that can race with auth events.
+    // Wait until the initial Supabase session restore has completed before deciding whether sign-in is required.
+    await authReadyPromise;
     if(!currentUser){
       const {data,error}=await sb.auth.getSession();
       if(error){toast("Could not restore your session. Please try again.");return;}
-      currentUser=data?.session?.user||null;
+      if(data?.session?.user) currentUser=data.session.user;
     }
     if(!currentUser){showAuth("signin");return;}
     $("#authModal").classList.add("hidden");
