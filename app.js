@@ -112,8 +112,10 @@
     else if(error)msg("#profileMessage",error.message,true);
     const tiers=await sb.from("adult_subscription_tiers").select("*").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
     $("#tierList").innerHTML=tiers.data?.length?tiers.data.map(t=>'<div class="compact-item"><span>'+escapeHtml(t.tier_name||"Membership")+'</span><b>'+escapeHtml(t.currency||"USD")+' '+((Number(t.price_minor||0)/100).toFixed(2))+'</b></div>').join(""):'<p class="tiny">Your membership tiers will appear here.</p>';
-    const media=await sb.from("adult_creator_media").select("id,media_type,moderation_status,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
-    $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+escapeHtml(m.moderation_status||"pending")+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
+    const media=await sb.from("adult_creator_media").select("id,media_type,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
+    $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+"Pending review"+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
+    const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
+    const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved — private video submissions are enabled.":"Account review pending — video uploads unlock after age, identity and consent verification and creator approval.";}
   }
   $("#profileForm").addEventListener("submit",async e=>{
     e.preventDefault();
@@ -158,7 +160,7 @@
     try{
       const upload=await sb.storage.from("creator-videos").upload(path,file,{contentType:file.type,upsert:false});
       if(upload.error)throw upload.error;
-      const saved=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,storage_path:path,media_type:"video",consent_confirmed:true});
+      const saved=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,media_url:path,media_type:"video",consent_confirmed:true});
       if(saved.error){await sb.storage.from("creator-videos").remove([path]);throw saved.error;}
       msg("#mediaMessage","Video uploaded privately. It is pending moderation and is not public.");form.reset();await loadDashboard();
     }catch(error){msg("#mediaMessage",error.message||"Upload failed. Please try again.",true);}
