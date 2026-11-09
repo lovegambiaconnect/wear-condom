@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
@@ -28,57 +30,56 @@
     </div>
   </div>
 
-  <header class="topbar">
-    <a class="brand" href="#home" aria-label="Wear Condom home"><span class="brand-mark small">WC<span>•</span></span><span>WEAR <b>CONDOM</b></span></a>
-    <nav class="desktop-nav">
-      <a href="#discover">Discover</a><a href="#wellness">Wellness</a><a href="#creators">For creators</a>
-    </nav>
-    <div class="nav-actions">
-      <span class="user-chip" id="userChip">18+ COMMUNITY</span>
-      <button class="btn btn-outline btn-small" id="openAuth">Sign in</button>
-      <button class="btn btn-gold btn-small" id="joinTop">Join free</button>
-      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+  <header class="stream-topbar">
+    <div class="stream-brand-area">
+      <button class="icon-button mobile-menu" id="menuToggle" aria-label="Open menu"><i data-lucide="menu"></i></button>
+      <a class="stream-brand" href="#home"><span class="brand-play"><i data-lucide="play"></i></span><span>WEAR<span class="brand-hot">CONDOM</span></span></a>
     </div>
+    <form class="stream-search" id="streamSearch"><i data-lucide="search"></i><input id="streamSearchInput" type="search" placeholder="Search videos, creators and live rooms" aria-label="Search"><kbd>⌘ K</kbd></form>
+    <div class="stream-top-actions"><span id="userChip" class="sr-only">18+ COMMUNITY</span><button class="upload-top" id="creatorJoin"><i data-lucide="upload"></i><span>UPLOAD</span></button><button class="icon-button" id="openAuth" aria-label="Sign in"><i data-lucide="user-round"></i></button><button class="join-top" id="joinTop">Join</button></div>
   </header>
 
-  <main id="home">
-    <section class="stream-hero section-wrap" id="discover">
-      <div class="stream-hero-copy"><p class="eyebrow"><span class="live-dot"></span> WEAR CONDOM · 18+ STREAMING</p><h1>Watch what you love.<br><em>Connect with creators.</em></h1><p class="hero-text">A pink-powered streaming community for approved adult creators. Explore on-demand videos, discover channels and join live broadcasts. Consent, privacy and safety come first.</p><div class="hero-actions"><button class="btn btn-pink" id="heroJoin">Create your account ↗</button><a class="btn btn-outline" href="live.html">Watch live rooms ↗</a></div><div class="trust-row"><span>✓ 18+ only</span><span>✓ Verified creators</span><span>✓ Consent first</span></div></div>
-      <div class="stream-feature"><div class="feature-screen"><span class="feature-badge">STREAMING HUB</span><div class="play-mark">▶</div><div class="feature-caption"><b>YOUR NEXT FAVOURITE CHANNEL</b><small>Videos · Live rooms · Creator channels</small></div></div><div class="feature-bottom"><span><b>WEAR CONDOM</b><small>Discover the creator community</small></span><a href="live.html">OPEN LIVE ↗</a></div></div>
-    </section>
-    <section class="stats-strip"><div><strong>VOD</strong><span>On-demand videos</span></div><div><strong>LIVE</strong><span>Live broadcasts</span></div><div><strong>18+</strong><span>Adults only</span></div><div><strong>SAFE</strong><span>Consent-led community</span></div></section>
-    <section class="section-wrap section-block" id="video-library">
-      <div class="section-heading"><div><p class="eyebrow">STREAMING LIBRARY</p><h2>Explore <em>videos.</em></h2><p class="muted">Approved creator videos will appear here after review. Private uploads are never shown publicly before approval.</p></div><button class="btn btn-pink" id="videoJoin">Become a creator ↗</button></div>
-      <div class="streaming-empty"><div class="empty-play">▶</div><h3>Your video library starts here</h3><p>There are no published videos yet. Approved creator uploads will appear here for on-demand playback.</p><a class="text-link" href="#creators">Upload as a creator ↓</a></div>
-    </section>
-    <section class="section-wrap section-block" id="live-discover">
-      <div class="section-heading"><div><p class="eyebrow">HAPPENING IN REAL TIME</p><h2>Live <em>channels.</em></h2><p class="muted">Join live broadcasts from approved, verified adult creators.</p></div><a class="btn btn-pink" href="live.html">Enter live streaming ↗</a></div>
-      <div class="live-feature-card"><div class="live-feature-art"><span class="live-tag">● LIVE ROOM PREVIEW</span><span class="live-big-icon">◉</span><b>LIVE STREAMING</b></div><div class="live-feature-copy"><span class="eyebrow">CREATOR BROADCASTS</span><h3>Find your live community.</h3><p>Live rooms will display here when an approved creator starts a broadcast. This preview is not a real broadcast and has no live viewers.</p><a href="live.html" class="text-link">Open live room ↗</a></div></div>
-    </section>
-    <section class="section-wrap section-block" id="creators">
-      <div class="section-heading"><div><p class="eyebrow">CREATOR CHANNELS</p><h2>Meet the <em>creators.</em></h2><p class="muted">Verified public creator channels appear after identity, age, consent and moderation review.</p></div></div>
-      <div class="creator-grid" id="creatorGrid"><div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div></div>
-    </section>
-    <section class="wellness-band" id="wellness">
-      <div class="section-wrap wellness-layout">
-        <div><p class="eyebrow">KNOWLEDGE IS POWER</p><h2>Better choices.<br><em>Better experiences.</em></h2><p class="muted">Straightforward, judgement-free information about sexual health, safer sex, boundaries and consent.</p><a class="btn btn-outline" href="#articles">Explore wellness resources ↗</a></div>
-        <div class="wellness-symbol"><div class="symbol-ring">CARE<span>•</span></div><p>PROTECT YOURSELF.<br>RESPECT EACH OTHER.</p></div>
-      </div>
+  <main id="home" class="stream-app">
+    <aside class="stream-left-rail">
+      <nav class="rail-nav" aria-label="Main navigation">
+        <a class="rail-link active" href="#home"><i data-lucide="house"></i><span>Home</span></a>
+        <a class="rail-link" href="#clips"><i data-lucide="clapperboard"></i><span>Clips</span></a>
+        <a class="rail-link" href="#live-now"><i data-lucide="radio-tower"></i><span>Live</span></a>
+        <a class="rail-link" href="#creators"><i data-lucide="users"></i><span>Creators</span></a>
+        <a class="rail-link" href="#videos"><i data-lucide="play-square"></i><span>Library</span></a>
+        <a class="rail-link" href="#history"><i data-lucide="history"></i><span>History</span></a>
+        <div class="rail-divider"></div>
+        <button class="rail-link rail-button" id="openSettings"><i data-lucide="settings"></i><span>Settings</span></button>
+      </nav>
+      <div class="rail-bottom"><span class="rail-18">18+</span><small>Adults only<br>Consent first</small></div>
+    </aside>
+
+    <section class="stream-center">
+      <div class="feed-heading"><div><p class="stream-eyebrow"><span class="pulse-dot"></span> REAL-TIME BROADCASTS</p><h1>Live <span>now.</span></h1></div><a class="see-all" href="live.html">Open live studio <i data-lucide="arrow-up-right"></i></a></div>
+      <section class="live-slot-grid" id="live-now" aria-label="Live broadcasts">
+        <article class="live-slot slot-one"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="radio-tower"></i></span><span class="slot-caption">BROADCAST SLOT 01</span></div><div class="slot-info"><b>No active broadcast</b><small>First approved creator will appear here</small></div></article>
+        <article class="live-slot slot-two"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="headphones"></i></span><span class="slot-caption">BROADCAST SLOT 02</span></div><div class="slot-info"><b>Waiting for a creator</b><small>Live channels are not populated with demo accounts</small></div></article>
+        <article class="live-slot slot-three"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="video"></i></span><span class="slot-caption">BROADCAST SLOT 03</span></div><div class="slot-info"><b>Coming up live</b><small>Verified broadcasts only</small></div></article>
+        <article class="live-slot slot-four"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="sparkles"></i></span><span class="slot-caption">BROADCAST SLOT 04</span></div><div class="slot-info"><b>Your next live channel</b><small>Be the first to go live</small></div></article>
+      </section>
+
+      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">CURATED FOR THE COMMUNITY</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
+      <section class="video-empty-grid" id="clips" aria-label="Videos">
+        <article class="video-empty-card"><div class="video-empty-art art-a"><i data-lucide="play-circle"></i><span>VIDEO LIBRARY</span></div><b>Published videos will appear here</b><small>Creator uploads are reviewed before publication.</small></article>
+        <article class="video-empty-card"><div class="video-empty-art art-b"><i data-lucide="clapperboard"></i><span>CREATOR CLIPS</span></div><b>Discover new clips</b><small>No public clips are available yet.</small></article>
+        <article class="video-empty-card"><div class="video-empty-art art-c"><i data-lucide="film"></i><span>ON DEMAND</span></div><b>Watch on your schedule</b><small>Approved videos will be listed here.</small></article>
+        <article class="video-empty-card"><div class="video-empty-art art-d"><i data-lucide="sparkles"></i><span>FRESH CONTENT</span></div><b>New creator content</b><small>Real creators only. No fictional profiles.</small></article>
+      </section>
+
+      <section class="creator-strip" id="creators"><div class="feed-heading"><div><p class="stream-eyebrow">COMMUNITY CHANNELS</p><h2>Creator <span>channels.</span></h2></div><button class="text-action" id="videoJoin">Become a creator <i data-lucide="arrow-up-right"></i></button></div><div class="creator-grid" id="creatorGrid"><div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div></div></section>
+      <section class="wellness-mini" id="wellness"><div><p class="stream-eyebrow">SAFETY & WELLNESS</p><h3>Good experiences start with <span>respect.</span></h3><p>Learn about consent, privacy and safer choices.</p></div><a href="legal.html">Community rules <i data-lucide="arrow-up-right"></i></a></section>
     </section>
 
-    <section class="section-wrap section-block" id="articles">
-      <div class="section-heading"><div><p class="eyebrow">THE WELLNESS HUB</p><h2>Read. Learn. <em>Look after you.</em></h2></div></div>
-      <div class="article-grid" id="articleGrid">
-        <article class="article-card"><span class="article-number">01 / SAFER SEX</span><h3>Condoms and safer sex basics</h3><p>Learn how correct and consistent condom use can reduce the risk of many sexually transmitted infections and unintended pregnancy.</p><a href="https://www.who.int/news-room/fact-sheets/detail/condoms" target="_blank" rel="noopener">Read trusted guidance ↗</a></article>
-        <article class="article-card"><span class="article-number">02 / CONSENT</span><h3>Consent is ongoing</h3><p>Consent should be freely given, informed, specific and reversible. A person can change their mind at any time.</p><a href="https://www.nhs.uk/live-well/sexual-health/" target="_blank" rel="noopener">Explore sexual health ↗</a></article>
-        <article class="article-card"><span class="article-number">03 / ONLINE SAFETY</span><h3>Protect your privacy</h3><p>Think carefully before sharing identifying details or intimate content. Never pressure anyone to share images.</p><a href="legal.html">Read our safety rules ↗</a></article>
-      </div>
-    </section>
-
-    <section class="creator-cta section-wrap" id="creators">
-      <div><p class="eyebrow">YOUR CREATIVE SPACE</p><h2>Make your profile.<br><em>Build your community.</em></h2><p class="muted">Create a profile, introduce your work and manage membership tier ideas from your private dashboard. Creator submissions are subject to review.</p></div>
-      <div class="cta-actions"><button class="btn btn-gold" id="creatorJoin">Start as a creator ↗</button><span class="tiny">No payment processing is enabled yet. Membership prices are profile information only.</span></div>
-    </section>
+    <aside class="stream-right-panel">
+      <section class="chat-widget"><div class="panel-heading"><div><span class="panel-kicker">COMMUNITY CHAT</span><h2>Live chat</h2></div><span class="chat-lock"><i data-lucide="lock"></i> 18+</span></div><div class="chat-empty"><div class="chat-orbit"><i data-lucide="messages-square"></i></div><b>Conversation starts live</b><p>Choose an active broadcast to see its chat. Messages are not fabricated or shown before a real room is active.</p></div><div class="chat-compose"><div class="chat-input-faux"><i data-lucide="message-circle"></i><span>Join a live room to chat…</span></div><button class="chat-join" id="chatJoin">JOIN CONVERSATION <i data-lucide="arrow-up-right"></i></button></div></section>
+      <section class="trending-widget"><div class="panel-heading"><div><span class="panel-kicker">WHAT'S POPULAR</span><h2>Trending</h2></div><button class="upload-mini" id="trendingUpload">UPLOAD <i data-lucide="plus"></i></button></div><div class="trending-empty"><i data-lucide="trending-up"></i><b>Nothing trending yet</b><p>Trending videos will appear after creators publish approved content.</p></div><button class="upload-wide" id="trendingUploadBottom"><i data-lucide="upload"></i> UPLOAD A VIDEO</button></section>
+      <div class="right-safety"><i data-lucide="shield-check"></i><span>Verified adults. Clear consent. Safer community.</span></div>
+    </aside>
   </main>
 
   <section class="dashboard section-wrap hidden" id="dashboard">
@@ -91,7 +92,8 @@
     <p class="dashboard-footnote">Your account is not publicly listed until your profile is reviewed and approved. Never upload content involving minors, coercion, non-consensual imagery or anyone whose age cannot be verified.</p>
   </section>
 
-  <footer><div class="footer-brand"><span class="brand-mark small">WC<span>•</span></span><b>WEAR CONDOM</b></div><p>Adults only. Consent always. Safer choices matter.</p><div><a href="legal.html">Terms & safety</a><a href="#wellness">Wellness</a><a href="mailto:support@wearcondom.com">Contact</a></div><small>© <span id="year"></span> WEAR CONDOM. All rights reserved.</small></footer>
+  <section class="hidden" id="articles"><div id="articleGrid"></div></section>
+    <footer class="stream-footer"><div class="footer-brand"><span class="brand-mark small">WC<span>•</span></span><b>WEAR CONDOM</b></div><p>18+ only · Consent first · Respect always</p><div><a href="legal.html">Terms & safety</a><a href="#wellness">Wellness</a><a href="mailto:support@wearcondom.com">Contact</a></div><small>© <span id="year"></span> WEAR CONDOM</small></footer>
 
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-card"><button class="modal-close" id="closeAuth" aria-label="Close">×</button><p class="eyebrow">WELCOME TO THE CLUB</p><h2 id="authTitle">Create your <em>account.</em></h2>
@@ -101,6 +103,14 @@
     </div>
   </div>
   <div class="toast" id="toast" role="status"></div>
-<script>document.getElementById("videoJoin")?.addEventListener("click",()=>document.getElementById("joinTop")?.click());</script>
+<script>
+  document.addEventListener('DOMContentLoaded',()=>{if(window.lucide)lucide.createIcons();
+    const auth=()=>document.getElementById('joinTop')?.click();
+    ['chatJoin','trendingUpload','trendingUploadBottom'].forEach(id=>document.getElementById(id)?.addEventListener('click',auth));
+    document.getElementById('openSettings')?.addEventListener('click',auth);
+    document.getElementById('streamSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('streamSearchInput').value.trim().toLowerCase();const cards=[...document.querySelectorAll('.video-empty-card,.creator-card')];let found=0;cards.forEach(c=>{const ok=!q||c.textContent.toLowerCase().includes(q);c.style.display=ok?'':'none';if(ok)found++;});if(q&&!found)document.getElementById('streamSearchInput').placeholder='No matching published content yet';});
+    document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');}));
+  });
+</script>
 </body>
 </html>

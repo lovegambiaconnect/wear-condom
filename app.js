@@ -36,11 +36,12 @@
   $("#leaveSite").addEventListener("click",()=>{document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:30px;color:#ddd;font-family:Arial"><div><h1>Access unavailable</h1><p>This community is for adults aged 18 and over.</p></div></main>';});
 
   function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account ↗":"Sign in ↗"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
-  ["#openAuth","#joinTop","#heroJoin","#creatorJoin"].forEach(s=>$(s).addEventListener("click",()=>showAuth("signup")));
+  ["#openAuth","#joinTop"].forEach(s=>$(s).addEventListener("click",()=>showAuth("signup")));
+  $("#creatorJoin").addEventListener("click",()=>currentUser?openDashboard():showAuth("signup"));
+  $("#videoJoin").addEventListener("click",()=>currentUser?openDashboard():showAuth("signup"));
   $("#closeAuth").addEventListener("click",()=>$("#authModal").classList.add("hidden"));
   $$(".auth-tabs button").forEach(b=>b.addEventListener("click",()=>showAuth(b.dataset.mode)));
-  $("#menuToggle").addEventListener("click",()=>$(".desktop-nav").classList.toggle("open"));
-  $$(".desktop-nav a").forEach(a=>a.addEventListener("click",()=>$(".desktop-nav").classList.remove("open")));
+  $("#menuToggle").addEventListener("click",()=>$(".stream-app").classList.toggle("menu-open"));
 
   $("#authForm").addEventListener("submit",async e=>{
     e.preventDefault();
