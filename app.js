@@ -1,7 +1,7 @@
 (() => {
   const cfg = window.WEAR_CONDOM_CONFIG || {};
   const hasConfig = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && !String(cfg.supabaseAnonKey).includes("PASTE_YOUR"));
-  const sb = hasConfig && window.supabase ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey) : null;
+  const sb = hasConfig && window.supabase ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storage: window.localStorage } }) : null;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   let currentUser = null, authMode = "signup", toastTimer;
@@ -37,8 +37,10 @@
 
   function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account â":"Sign in â"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
   ["#openAuth","#joinTop"].forEach(s=>$(s).addEventListener("click",()=>showAuth("signup")));
-  $("#creatorJoin").addEventListener("click",()=>openDashboard());
-  $("#videoJoin").addEventListener("click",()=>openDashboard());
+  ["#creatorJoin","#videoJoin","#trendingUpload","#trendingUploadBottom"].forEach(selector=>{
+    const button=$(selector);
+    if(button) button.addEventListener("click",event=>{event.preventDefault();openDashboard();});
+  });
   $("#closeAuth").addEventListener("click",()=>$("#authModal").classList.add("hidden"));
   $$(".auth-tabs button").forEach(b=>b.addEventListener("click",()=>showAuth(b.dataset.mode)));
   $("#menuToggle").addEventListener("click",()=>$(".stream-app").classList.toggle("menu-open"));
