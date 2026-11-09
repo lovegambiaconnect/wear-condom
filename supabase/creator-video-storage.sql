@@ -2,6 +2,10 @@
 -- Run this in the WEAR CONDOM Supabase SQL Editor only.
 -- Files remain private; creators cannot publish their own videos.
 
+-- Bring the existing media table up to the schema expected by this policy.
+alter table public.adult_creator_media
+  add column if not exists consent_confirmed boolean not null default false;
+
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'creator-videos',
@@ -41,8 +45,9 @@ using (
   and (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- Tighten metadata insertion to approved, verified adult creators.
+-- Only verified adult creators can submit their own videos for review.
 drop policy if exists "Creators can submit their own media for review" on public.adult_creator_media;
+drop policy if exists "Verified creators can submit video for review" on public.adult_creator_media;
 create policy "Verified creators can submit video for review"
 on public.adult_creator_media for insert to authenticated
 with check (
