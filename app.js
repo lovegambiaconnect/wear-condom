@@ -73,6 +73,41 @@
     const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
     if(error) throw error;
   }
+  async function loadAdminPanel(){
+    const panel=$("#adminPanel"); if(!panel||!currentUser||!sb)return;
+    const {data:isAdmin,error:adminError}=await sb.rpc("is_wear_condom_admin");
+    if(adminError||isAdmin!==true){panel.classList.add("hidden");return;}
+    panel.classList.remove("hidden");
+    msg("#adminMessage","Administrator access confirmed. Review evidence securely before marking checks complete.");
+    await loadAdminQueue();
+  }
+  async function loadAdminQueue(){
+    const host=$("#adminQueue"); if(!host)return;
+    const {data,error}=await sb.from("adult_creator_profiles").select("id,display_name,country,created_at,is_adult_verified,identity_verified,consent_reviewed,is_approved,moderation_status").order("created_at",{ascending:false});
+    if(error){host.innerHTML='<p class="tiny">Could not load applications: '+escapeHtml(error.message)+'</p>';return;}
+    if(!data?.length){host.innerHTML='<div class="empty-state">No creator applications have been submitted yet.</div>';return;}
+    host.innerHTML=data.map(p=>{
+      const id=escapeHtml(p.id); const ready=p.is_adult_verified&&p.identity_verified&&p.consent_reviewed;
+      return '<article class="admin-creator" data-creator="'+id+'"><div class="admin-creator-head"><div><h3>'+escapeHtml(p.display_name||'Creator')+'</h3><p class="tiny">'+escapeHtml(p.country||'Country not provided')+' · Joined '+(p.created_at?new Date(p.created_at).toLocaleDateString():'date unavailable')+'</p><p class="tiny">Account ID: '+id.slice(0,8)+'…</p></div><span class="admin-status">'+escapeHtml(p.moderation_status||'pending')+'</span></div><div class="admin-checks"><label><input type="checkbox" data-field="is_adult_verified" '+(p.is_adult_verified?'checked':'')+'> Age evidence reviewed</label><label><input type="checkbox" data-field="identity_verified" '+(p.identity_verified?'checked':'')+'> Identity evidence reviewed</label><label><input type="checkbox" data-field="consent_reviewed" '+(p.consent_reviewed?'checked':'')+'> Consent evidence reviewed</label></div><p class="tiny">Approval requires all three checks. Only mark a check after completing the relevant evidence review.</p><div class="admin-actions"><button class="btn btn-outline btn-small" data-action="save-checks">Save verification checks</button><button class="btn btn-gold btn-small" data-action="approve" '+(ready?'':'disabled')+'>Approve creator</button><button class="btn btn-outline btn-small" data-action="reject">Reject application</button></div></article>';
+    }).join('');
+  }
+  $("#adminQueue")?.addEventListener("click",async e=>{
+    const button=e.target.closest("button[data-action]"); if(!button)return;
+    const card=button.closest("[data-creator]"); if(!card||!currentUser)return;
+    const id=card.dataset.creator, action=button.dataset.action;
+    const checks={}; card.querySelectorAll("input[data-field]").forEach(input=>checks[input.dataset.field]=input.checked);
+    if(action==="approve"&&!(checks.is_adult_verified&&checks.identity_verified&&checks.consent_reviewed)){msg("#adminMessage","Approval blocked: all age, identity and consent checks must be complete.",true);return;}
+    button.disabled=true;
+    let update;
+    if(action==="save-checks") update=checks;
+    if(action==="approve") update={...checks,is_approved:true,moderation_status:"approved"};
+    if(action==="reject") update={is_approved:false,moderation_status:"rejected"};
+    const {error}=await sb.from("adult_creator_profiles").update(update).eq("id",id);
+    if(error){msg("#adminMessage",error.message,true);button.disabled=false;return;}
+    msg("#adminMessage",action==="approve"?"Creator approved. Upload access is now enabled subject to storage rules.":action==="reject"?"Application rejected.":"Verification checks saved.");
+    await loadAdminQueue(); await loadCreators();
+  });
+
   async function loadSession(){
     if(!sb){$("#creatorGrid").innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';return;}
     const {data}=await sb.auth.getSession(); currentUser=data.session?.user||null; updateAuthUI();
@@ -107,6 +142,7 @@
   function openDashboard(){if(!currentUser){showAuth("signin");return;}$("#dashboard").classList.remove("hidden");$("#dashboard").scrollIntoView({behavior:"smooth"});loadDashboard();}
   async function loadDashboard(){
     if(!sb||!currentUser)return;
+    await loadAdminPanel();
     const {data,error}=await sb.from("adult_creator_profiles").select("*").eq("id",currentUser.id).maybeSingle();
     if(data){$("#displayName").value=data.display_name||currentUser.user_metadata?.display_name||"";$("#bio").value=data.bio||"";$("#country").value=data.country||"";}
     else if(error)msg("#profileMessage",error.message,true);
