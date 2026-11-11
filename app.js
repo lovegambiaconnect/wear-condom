@@ -273,7 +273,7 @@ await loadAdminQueue();
     if(error){msg("#adminMessage",error.message,true);button.disabled=false;return;}
     if(!data){msg("#adminMessage","No creator row was returned. Nothing was changed.",true);button.disabled=false;return;}
     msg("#adminMessage",action==="approve"?"Creator approved and saved in Supabase.":action==="reject"?"Application rejection saved.":"Verification checks saved in Supabase.");
-    await loadAdminQueue(); await loadCreators();
+await loadCreators(); await loadArticles(); await loadPublicVideos();
   });
 
   async function loadSession(){
