@@ -67,6 +67,7 @@
         // Ensure members who confirmed email after registration receive their creator profile row.
         if(result.data.user) await ensureProfile(result.data.user, result.data.user.user_metadata?.display_name || result.data.user.email?.split("@")[0] || "New creator");
         $("#authModal").classList.add("hidden");toast("Welcome back.");
+        await handleMembershipReturn();
       }
     }catch(err){msg("#authMessage",err.message||"Something went wrong. Please try again.",true);}
     finally{$("#authSubmit").disabled=false;}
@@ -173,6 +174,7 @@
     updateAuthUI();
     resolveAuthReady();
     await loadCreators(); await loadPublicVideos(); await loadArticles();
+    await handleMembershipReturn();
   }
   function updateAuthUI(){
     $("#userChip").textContent=currentUser?(currentUser.email||"MEMBER"):"18+ COMMUNITY";
@@ -261,6 +263,53 @@
     const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
     const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved — private video submissions are enabled.":"Account review pending — video uploads unlock after age, identity and consent verification and creator approval.";}
   }
+  let membershipReturnHandled=false;
+  async function handleMembershipReturn(){
+    if(membershipReturnHandled||!sb||!currentUser)return;
+    const url=new URL(window.location.href);
+    const result=url.searchParams.get("membership");
+    if(result!=="return"&&result!=="cancel")return;
+    membershipReturnHandled=true;
+    const paymentId=sessionStorage.getItem("wearMembershipPaymentId");
+    url.searchParams.delete("membership");
+    window.history.replaceState({},"",url.pathname+url.search+url.hash);
+    if(result==="cancel"){
+      sessionStorage.removeItem("wearMembershipPaymentId");
+      msg("#membershipMessage","Payment was cancelled. No membership was activated.",true);
+      return;
+    }
+    if(!paymentId){
+      msg("#membershipMessage","We have returned from checkout, but could not find the payment reference. Please contact support before paying again.",true);
+      return;
+    }
+    msg("#membershipMessage","Thank you. We are confirming your payment securely with Modem Pay…");
+    for(let attempt=0;attempt<15;attempt++){
+      const {data,error}=await sb.from("wear_membership_payments").select("status,amount_gmd,currency,paid_at").eq("id",paymentId).eq("user_id",currentUser.id).maybeSingle();
+      if(error){
+        msg("#membershipMessage","Your payment is being checked, but its status is temporarily unavailable. Please refresh this page shortly.",true);
+        return;
+      }
+      if(!data){
+        msg("#membershipMessage","We could not find this payment under your account. Please contact support before trying again.",true);
+        return;
+      }
+      if(data.status==="paid"){
+        sessionStorage.removeItem("wearMembershipPaymentId");
+        await loadMembershipPanel();
+        msg("#membershipMessage","Payment confirmed! Your Wear Condom membership is now active. Amount paid: "+String(data.currency||"GMD")+" "+Number(data.amount_gmd).toLocaleString("en-GM")+".");
+        toast("Payment successful. Your membership is active.");
+        return;
+      }
+      if(data.status==="failed"){
+        sessionStorage.removeItem("wearMembershipPaymentId");
+        msg("#membershipMessage","The payment was not completed, so your membership has not been activated. You can try again.",true);
+        return;
+      }
+      if(attempt<14)await new Promise(resolve=>setTimeout(resolve,2000));
+    }
+    msg("#membershipMessage","Your payment is still awaiting confirmation from Modem Pay. Please do not pay again. Refresh this page in a moment; your membership will activate when confirmation arrives.");
+  }
+
   async function loadMembershipPanel(){
     const host=$("#membershipPlans");
     if(!host||!sb||!currentUser)return;
@@ -299,6 +348,7 @@
       if(!data?.payment_url)throw new Error("Modem Pay did not return a checkout link. Please try again.");
       const checkoutUrl=new URL(data.payment_url);
       if(checkoutUrl.protocol!=="https:")throw new Error("The checkout link is not secure. Please contact support.");
+      if(data.payment_id)sessionStorage.setItem("wearMembershipPaymentId",data.payment_id);
       window.location.assign(checkoutUrl.toString());
     }catch(error){
       msg("#membershipMessage",error.message||"Could not start payment. Please try again.",true);
