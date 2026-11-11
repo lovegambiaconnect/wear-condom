@@ -333,7 +333,19 @@
     }catch(error){msg("#mediaMessage",error.message||"Upload failed. Please try again.",true);}
     finally{button.disabled=false;button.textContent="Upload privately for review";}
   });
-  $("#signOut").addEventListener("click",async()=>{if(sb)await sb.auth.signOut();currentUser=null;updateAuthUI();toast("You have signed out.");});
+  let livePreviewStream=null;
+  const livePreview=$('#liveCameraPreview'), livePlaceholder=$('#livePreviewPlaceholder');
+  const stopLivePreview=()=>{if(livePreviewStream){livePreviewStream.getTracks().forEach(track=>track.stop());livePreviewStream=null;}if(livePreview){livePreview.pause();livePreview.srcObject=null;}if(livePlaceholder)livePlaceholder.hidden=false;$('#previewLiveCamera').disabled=false;$('#stopLiveCamera').disabled=true;$('#liveStudioStatus').textContent='OFFLINE';};
+  $('#previewLiveCamera').addEventListener('click',async()=>{
+    if(!navigator.mediaDevices?.getUserMedia){msg('#liveStudioMessage','Camera preview is not available in this browser. Please use a supported browser over HTTPS.',true);return;}
+    const button=$('#previewLiveCamera');button.disabled=true;msg('#liveStudioMessage','Requesting camera and microphone permission…');
+    try{livePreviewStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:true});livePreview.srcObject=livePreviewStream;await livePreview.play();livePlaceholder.hidden=true;$('#stopLiveCamera').disabled=false;$('#liveStudioStatus').textContent='PREVIEW';msg('#liveStudioMessage','Camera preview is active on this device only. You are not broadcasting.');}
+    catch(error){stopLivePreview();msg('#liveStudioMessage',error.name==='NotAllowedError'?'Camera or microphone permission was denied. Allow access in your browser settings and try again.':(error.message||'Could not start camera preview.'),true);}
+    finally{button.disabled=false;}
+  });
+  $('#stopLiveCamera').addEventListener('click',()=>{stopLivePreview();msg('#liveStudioMessage','Camera preview stopped. Nothing was broadcast.');});
+  window.addEventListener('pagehide',stopLivePreview);
+  $("#signOut").addEventListener("click",async()=>{stopLivePreview();if(sb)await sb.auth.signOut();currentUser=null;updateAuthUI();toast("You have signed out.");});
   function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
   loadSession();
   const requestedAuth = new URLSearchParams(window.location.search).get("auth");

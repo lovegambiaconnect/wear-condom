@@ -261,6 +261,28 @@
 
     <div class="dashboard-grid">
 
+      <section class="panel live-studio" aria-labelledby="liveStudioTitle">
+        <div class="live-studio-head">
+          <div><p class="eyebrow">CREATOR BROADCAST</p><h3 id="liveStudioTitle">Live <em>studio.</em></h3><p class="tiny muted">Prepare your live session and check your camera before going on air.</p></div>
+          <span class="live-status-pill" id="liveStudioStatus">OFFLINE</span>
+        </div>
+        <div class="live-studio-layout">
+          <div class="live-preview-wrap">
+            <video id="liveCameraPreview" autoplay muted playsinline aria-label="Private camera preview"></video>
+            <div class="live-preview-placeholder" id="livePreviewPlaceholder"><span>◉</span><b>Your camera preview</b><small>Only you can see this preview. It is not a live broadcast.</small></div>
+          </div>
+          <div class="live-studio-controls">
+            <label>Live stream title<input id="liveStreamTitle" maxlength="100" placeholder="Give your live session a title"></label>
+            <label>About this live<textarea id="liveStreamDescription" maxlength="300" rows="3" placeholder="Tell viewers what your session is about"></textarea></label>
+            <label>Who can watch<select id="liveStreamAudience"><option value="public">Everyone (public)</option><option value="members">Signed-in members</option></select></label>
+            <div class="live-studio-actions"><button class="btn btn-outline" type="button" id="previewLiveCamera">Preview camera</button><button class="btn btn-outline" type="button" id="stopLiveCamera" disabled>Stop preview</button></div>
+            <button class="btn btn-gold live-start-disabled" type="button" id="startLiveBroadcast" disabled>Live broadcast not connected</button>
+            <p class="form-message" id="liveStudioMessage" role="status">Live broadcasting is being prepared. Your camera preview stays private; starting a public stream will unlock after the secure streaming service is connected.</p>
+          </div>
+        </div>
+      </section>
+
+
       <div class="panel profile-panel">
 
         <p class="eyebrow">PROFILE DETAILS</p>

@@ -97,3 +97,17 @@ html{scroll-behavior:smooth;background:var(--stream-bg)}body{margin:0;background
 .video-published-card{grid-column:1 / -1;width:100%;}
 .video-published-card video{width:100%;height:auto;aspect-ratio:16 / 9 !important;max-height:680px;object-fit:contain !important;background:#050505;border-radius:16px !important;}
 @media(max-width:620px){.video-published-card video{max-height:70vh;}}
+
+
+/* Creator live studio interface */
+.live-studio{width:100%;max-width:620px;border-color:#503247!important;background:linear-gradient(145deg,#171522,#11111a)!important}
+.live-studio-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.live-studio-head h3{font-size:22px;margin:4px 0}.live-studio-head h3 em{color:#ff6b8d;font-style:normal}
+.live-status-pill{flex-shrink:0;border:1px solid #5b3947;border-radius:20px;padding:6px 10px;color:#ff91a8;font-size:9px;letter-spacing:1px;font-weight:700}
+.live-studio-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:14px}
+.live-preview-wrap{position:relative;min-height:210px;aspect-ratio:16/9;overflow:hidden;border:1px solid #393344;border-radius:9px;background:#080810}
+.live-preview-wrap video{display:block;width:100%;height:100%;min-height:210px;object-fit:cover;background:#080810}
+.live-preview-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;text-align:center;color:#aaa5b9;pointer-events:none}
+.live-preview-placeholder span{font-size:30px;color:#ff6b8d}.live-preview-placeholder b{font-size:13px;color:#eee}.live-preview-placeholder small{max-width:240px;font-size:10px;line-height:1.5}
+.live-studio-actions{display:flex;gap:8px;flex-wrap:wrap}.live-studio-actions button{flex:1}.live-studio button:disabled{opacity:.5;cursor:not-allowed}.live-start-disabled{width:100%;opacity:.55;cursor:not-allowed!important}
+@media(min-width:900px){.live-studio-layout{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:start}.live-preview-wrap{min-height:250px}.live-preview-wrap video{min-height:250px}}
