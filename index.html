@@ -104,7 +104,7 @@
 
     <section class="stream-center">
 
-      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">FOR YOU</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
+      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">FOR YOU</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected" type="button" data-feed-filter="all" aria-pressed="true">All</button><button class="filter-chip" type="button" data-feed-filter="videos" aria-pressed="false">Videos</button><button class="filter-chip" type="button" data-feed-filter="clips" aria-pressed="false">Clips</button><button class="filter-chip" type="button" data-feed-filter="recent" aria-pressed="false">Recently added</button></div></div>
 
       <section class="video-empty-grid" id="clips" aria-label="Videos">
 
@@ -500,17 +500,56 @@
 
       });
 
-      document.querySelectorAll('.filter-chip').forEach(b => {
-
-        b.addEventListener('click', () => {
-
-          document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('selected'));
-
-          b.classList.add('selected');
-
+      const feedHost = document.getElementById('clips');
+      let clipMetadataPending = new Set();
+      window.applyWearFeedFilter = () => {
+        if (!feedHost) return;
+        const active = document.querySelector('.filter-chip.selected')?.dataset.feedFilter || 'all';
+        const cards = [...feedHost.querySelectorAll('.video-published-card')];
+        const status = feedHost.querySelector('.feed-filter-empty');
+        if (active === 'recent') cards.sort((a, b) => Number(b.dataset.createdAt || 0) - Number(a.dataset.createdAt || 0)).forEach(card => feedHost.appendChild(card));
+        let visible = 0;
+        let pending = 0;
+        cards.forEach(card => {
+          const video = card.querySelector('video');
+          let show = active !== 'clips';
+          if (active === 'clips') {
+            if (video && video.readyState >= 1 && Number.isFinite(video.duration)) show = video.duration > 0 && video.duration <= 60;
+            else {
+              show = false;
+              pending++;
+              if (video && !clipMetadataPending.has(video)) {
+                clipMetadataPending.add(video);
+                video.addEventListener('loadedmetadata', () => { clipMetadataPending.delete(video); window.applyWearFeedFilter(); }, { once: true });
+                video.addEventListener('error', () => { clipMetadataPending.delete(video); window.applyWearFeedFilter(); }, { once: true });
+                video.load();
+              }
+            }
+          }
+          card.hidden = !show;
+          if (show) visible++;
         });
-
+        let message = '';
+        if (active === 'clips' && !visible) message = pending ? 'Checking for short clips…' : 'No short clips (60 seconds or less) are available yet.';
+        else if (!cards.length) message = 'Approved videos will appear here after review.';
+        let empty = feedHost.querySelector('.feed-filter-empty');
+        if (message) {
+          if (!empty) { empty = document.createElement('p'); empty.className = 'feed-filter-empty empty-state'; feedHost.appendChild(empty); }
+          empty.textContent = message;
+          empty.hidden = false;
+        } else if (empty) empty.hidden = true;
+      };
+      document.querySelectorAll('.filter-chip').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.filter-chip').forEach(item => {
+            const selected = item === button;
+            item.classList.toggle('selected', selected);
+            item.setAttribute('aria-pressed', String(selected));
+          });
+          window.applyWearFeedFilter();
+        });
       });
+      window.applyWearFeedFilter();
 
     });
 

@@ -199,8 +199,9 @@
       const publicUrl=sb.storage.from("published-videos").getPublicUrl(v.media_url).data?.publicUrl;
       if(!publicUrl)return "";
       const date=v.created_at?new Date(v.created_at).toLocaleDateString():"";
-      return '<article class="video-empty-card video-published-card"><video controls playsinline preload="metadata" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #29293e;border-radius:13px;background:#080808" src="'+escapeHtml(publicUrl)+'"></video><b>'+escapeHtml(creator.display_name||"Verified creator")+'</b>'+(v.title?'<p class="tiny">'+escapeHtml(v.title)+'</p>':'')+'<small>'+escapeHtml(creator.country||"Community")+(date?" · "+escapeHtml(date):"")+'</small></article>';
+      return '<article class="video-empty-card video-published-card" data-created-at="'+(v.created_at?new Date(v.created_at).getTime():0)+'"><video controls playsinline preload="metadata" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #29293e;border-radius:13px;background:#080808" src="'+escapeHtml(publicUrl)+'"></video><b>'+escapeHtml(creator.display_name||"Verified creator")+'</b>'+(v.title?'<p class="tiny">'+escapeHtml(v.title)+'</p>':'')+'<small>'+escapeHtml(creator.country||"Community")+(date?" · "+escapeHtml(date):"")+'</small></article>';
     }).filter(Boolean).join("");
+    window.applyWearFeedFilter?.();
   }
   async function loadCreators(){
     const grid=$("#creatorGrid");
