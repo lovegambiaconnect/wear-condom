@@ -85,6 +85,54 @@
     panel.classList.remove("hidden");
     msg("#adminMessage","Administrator access confirmed. Review evidence securely before marking checks complete.");
     await loadAdminQueue();
+    await loadAdminMediaQueue();
+    const mediaHost = $("#adminMediaQueue");
+    if(mediaHost && mediaHost.dataset.bound !== "yes"){
+      mediaHost.dataset.bound = "yes";
+      mediaHost.addEventListener("click", async e=>{
+        const button=e.target.closest("button[data-media-action]"); if(!button)return;
+        const card=button.closest("[data-media]"); if(!card||!currentUser)return;
+        const id=card.dataset.media, action=button.dataset.mediaAction;
+        const {data:row,error:lookupError}=await sb.from("adult_creator_media").select("id,media_url,moderation_status,storage_bucket,media_type").eq("id",id).maybeSingle();
+        if(lookupError||!row){msg("#adminMessage",lookupError?.message||"Video submission no longer exists.",true);return;}
+        if(row.moderation_status!=="pending"||row.storage_bucket!=="creator-videos"||row.media_type!=="video"){msg("#adminMessage","This submission is no longer pending review.",true);await loadAdminMediaQueue();return;}
+        if(!window.confirm(action==="approve"?"Approve this video and make it public?":"Reject this video? It will remain private."))return;
+        button.disabled=true;
+        if(action==="approve"){
+          const downloaded=await sb.storage.from("creator-videos").download(row.media_url);
+          if(downloaded.error){msg("#adminMessage","Could not retrieve private video: "+downloaded.error.message,true);button.disabled=false;return;}
+          const uploaded=await sb.storage.from("published-videos").upload(row.media_url,downloaded.data,{contentType:downloaded.data.type||"video/mp4",upsert:false});
+          if(uploaded.error){msg("#adminMessage","Could not copy video to public storage: "+uploaded.error.message,true);button.disabled=false;return;}
+          const reviewed=await sb.rpc("admin_review_media",{p_media_id:id,p_action:"approve",p_storage_bucket:"published-videos"});
+          if(reviewed.error){
+            const cleanup=await sb.storage.from("published-videos").remove([row.media_url]);
+            msg("#adminMessage","Approval failed: "+reviewed.error.message+(cleanup.error?" · Public copy cleanup failed: "+cleanup.error.message:" · Public copy removed; original remains private."),true);
+            button.disabled=false;return;
+          }
+          const removed=await sb.storage.from("creator-videos").remove([row.media_url]);
+          msg("#adminMessage",removed.error?"Video approved and published. The original private copy could not be removed: "+removed.error.message:"Video approved and published successfully.",!!removed.error);
+        }else{
+          const reviewed=await sb.rpc("admin_review_media",{p_media_id:id,p_action:"reject",p_storage_bucket:null});
+          if(reviewed.error){msg("#adminMessage",reviewed.error.message,true);button.disabled=false;return;}
+          msg("#adminMessage","Video rejected. It remains private and is not publicly accessible.");
+        }
+        await loadAdminMediaQueue();
+      });
+    }
+  }
+  async function loadAdminMediaQueue(){
+    const host=$("#adminMediaQueue"); if(!host||!sb||!currentUser)return;
+    host.innerHTML='<p class="tiny">Loading pending video submissions…</p>';
+    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,media_type,created_at,moderation_status,storage_bucket").eq("media_type","video").eq("moderation_status","pending").order("created_at",{ascending:true});
+    if(error){host.innerHTML='<p class="tiny">Could not load pending videos: '+escapeHtml(error.message)+'</p>';return;}
+    const rows=(data||[]).filter(x=>x.storage_bucket==="creator-videos");
+    if(!rows.length){host.innerHTML='<h3>Video moderation</h3><p class="tiny">No videos are waiting for review.</p>';return;}
+    const cards=await Promise.all(rows.map(async m=>{
+      const signed=await sb.storage.from("creator-videos").createSignedUrl(m.media_url,300);
+      const preview=signed.data?.signedUrl;
+      return '<article class="admin-creator" data-media="'+escapeHtml(m.id)+'"><div class="admin-creator-head"><div><h3>Private video submission</h3><p class="tiny">Submitted '+(m.created_at?new Date(m.created_at).toLocaleString():'date unavailable')+'</p><p class="tiny">Creator: '+escapeHtml(m.creator_id.slice(0,8))+'…</p></div><span class="admin-status">PENDING</span></div>'+(preview?'<video controls playsinline preload="metadata" style="width:100%;max-height:360px;border-radius:12px;background:#000" src="'+escapeHtml(preview)+'"></video>':'<p class="tiny">Private preview unavailable: '+escapeHtml(signed.error?.message||'Could not create preview link')+'</p>')+'<p class="tiny">This video is private and will remain private unless approved.</p><div class="admin-actions"><button class="btn btn-gold btn-small" data-media-action="approve" '+(preview?'':'disabled')+'>Approve &amp; publish</button><button class="btn btn-outline btn-small" data-media-action="reject">Reject video</button></div></article>';
+    }));
+    host.innerHTML='<h3>Video moderation queue</h3>'+cards.join('');
   }
   async function loadAdminQueue(){
     const host=$("#adminQueue"); if(!host)return;
