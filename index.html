@@ -1,243 +1,491 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <meta name="theme-color" content="#090909">
+
   <meta name="description" content="WEAR CONDOM — an 18+ creator community for confident connection, creator profiles, memberships and sexual wellness education.">
+
   <title>WEAR CONDOM — Adult Social Club</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
   <link rel="stylesheet" href="styles.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="config.js"></script>
+
   <script defer src="app.js"></script>
+
 </head>
+
 <body>
+
   <div class="age-screen" id="ageGate" aria-modal="true" role="dialog">
+
     <div class="age-card">
+
       <div class="brand-mark">WC<span>•</span></div>
+
       <p class="eyebrow">PRIVATE MEMBERS COMMUNITY</p>
+
       <h1>Adults only.<br><em>Always.</em></h1>
+
       <p class="muted">WEAR CONDOM is an 18+ social platform. You must be at least 18 years old to enter. Respect, consent and safer choices come first.</p>
+
       <label class="check-line"><input type="checkbox" id="ageConfirm"> I confirm that I am 18 years of age or older.</label>
+
       <button class="btn btn-gold full" id="enterSite" disabled>ENTER THE COMMUNITY <span>↗</span></button>
+
       <p class="tiny">By entering, you agree to our <a href="legal.html">community rules and terms</a>.</p>
+
       <button class="exit-link" id="leaveSite">I am under 18 — leave</button>
+
     </div>
+
   </div>
 
   <header class="stream-topbar">
+
     <div class="stream-brand-area">
+
       <button class="icon-button mobile-menu" id="menuToggle" aria-label="Open menu"><i data-lucide="menu"></i></button>
+
       <a class="stream-brand" href="#home"><span class="brand-play"><i data-lucide="play"></i></span><span>WEAR<span class="brand-hot">CONDOM</span></span></a>
+
     </div>
+
     <form class="stream-search" id="streamSearch"><i data-lucide="search"></i><input id="streamSearchInput" type="search" placeholder="Search videos, creators and live rooms" aria-label="Search"><kbd>⌘ K</kbd></form>
+
     <div class="stream-top-actions"><span id="userChip" class="sr-only">18+ COMMUNITY</span><button class="upload-top" id="creatorJoin"><i data-lucide="upload"></i><span>UPLOAD</span></button><button class="icon-button" id="openAuth" aria-label="Sign in"><i data-lucide="user-round"></i></button><button class="join-top" id="joinTop">Join</button></div>
+
   </header>
 
   <main id="home" class="stream-app">
+
     <aside class="stream-left-rail">
+
       <nav class="rail-nav" aria-label="Main navigation">
+
         <a class="rail-link active" href="#home"><i data-lucide="house"></i><span>Home</span></a>
+
         <a class="rail-link" href="#clips"><i data-lucide="clapperboard"></i><span>Clips</span></a>
+
         <a class="rail-link" href="#live-now"><i data-lucide="radio-tower"></i><span>Live</span></a>
+
         <a class="rail-link" href="#creators"><i data-lucide="users"></i><span>Creators</span></a>
+
         <a class="rail-link" href="#videos"><i data-lucide="play-square"></i><span>Library</span></a>
+
         <a class="rail-link" href="#history"><i data-lucide="history"></i><span>History</span></a>
+
         <div class="rail-divider"></div>
+
         <button class="rail-link rail-button" id="openSettings"><i data-lucide="settings"></i><span>Settings</span></button>
+
       </nav>
+
       <div class="rail-bottom"><span class="rail-18">18+</span><small>Adults only<br>Consent first</small></div>
+
     </aside>
 
     <section class="stream-center">
+
       <div class="feed-heading"><div><p class="stream-eyebrow"><span class="pulse-dot"></span> REAL-TIME BROADCASTS</p><h1>Live <span>now.</span></h1></div><a class="see-all" href="live.html">Open live studio <i data-lucide="arrow-up-right"></i></a></div>
+
       <section class="live-slot-grid" id="live-now" aria-label="Live broadcasts">
+
         <article class="live-slot slot-one"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="radio-tower"></i></span><span class="slot-caption">BROADCAST SLOT 01</span></div><div class="slot-info"><b>No active broadcast</b><small>First approved creator will appear here</small></div></article>
+
         <article class="live-slot slot-two"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="headphones"></i></span><span class="slot-caption">BROADCAST SLOT 02</span></div><div class="slot-info"><b>Waiting for a creator</b><small>Live channels are not populated with demo accounts</small></div></article>
+
         <article class="live-slot slot-three"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="video"></i></span><span class="slot-caption">BROADCAST SLOT 03</span></div><div class="slot-info"><b>Coming up live</b><small>Verified broadcasts only</small></div></article>
+
         <article class="live-slot slot-four"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="sparkles"></i></span><span class="slot-caption">BROADCAST SLOT 04</span></div><div class="slot-info"><b>Your next live channel</b><small>Be the first to go live</small></div></article>
+
       </section>
 
       <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">CURATED FOR THE COMMUNITY</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
+
       <section class="video-empty-grid" id="clips" aria-label="Videos">
+
         <article class="video-empty-card"><div class="video-empty-art art-a"><i data-lucide="play-circle"></i><span>VIDEO LIBRARY</span></div><b>Published videos will appear here</b><small>Creator uploads are reviewed before publication.</small></article>
+
         <article class="video-empty-card"><div class="video-empty-art art-b"><i data-lucide="clapperboard"></i><span>CREATOR CLIPS</span></div><b>Discover new clips</b><small>No public clips are available yet.</small></article>
+
         <article class="video-empty-card"><div class="video-empty-art art-c"><i data-lucide="film"></i><span>ON DEMAND</span></div><b>Watch on your schedule</b><small>Approved videos will be listed here.</small></article>
+
         <article class="video-empty-card"><div class="video-empty-art art-d"><i data-lucide="sparkles"></i><span>FRESH CONTENT</span></div><b>New creator content</b><small>Real creators only. No fictional profiles.</small></article>
+
+      </section>I
+      
+
+      <section class="creator-strip" id="creators">
+
+        <div class="feed-heading">
+
+          <div>
+
+            <p class="stream-eyebrow">COMMUNITY CHANNELS</p>
+
+            <h2>Creator <span>channels.</span></h2>
+
+          </div>
+
+          <button class="text-action" id="videoJoin">Become a creator <i data-lucide="arrow-up-right"></i></button>
+
+        </div>
+
+        <div class="creator-grid" id="creatorGrid">
+
+          <div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div>
+
+        </div>
+
       </section>
 
-      <section class="creator-strip" id="creators"><div class="feed-heading"><div><p class="stream-eyebrow">COMMUNITY CHANNELS</p><h2>Creator <span>channels.</span></h2></div><button class="text-action" id="videoJoin">Become a creator <i data-lucide="arrow-up-right"></i></button></div><div class="creator-grid" id="creatorGrid"><div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div></div></section>
-      <section class="wellness-mini" id="wellness"><div><p class="stream-eyebrow">SAFETY & WELLNESS</p><h3>Good experiences start with <span>respect.</span></h3><p>Learn about consent, privacy and safer choices.</p></div><a href="legal.html">Community rules <i data-lucide="arrow-up-right"></i></a></section>
+      <section class="wellness-mini" id="wellness">
+
+        <div>
+
+          <p class="stream-eyebrow">SAFETY & WELLNESS</p>
+
+          <h3>Good experiences start with <span>respect.</span></h3>
+
+          <p>Learn about consent, privacy and safer choices.</p>
+
+        </div>
+
+        <a href="legal.html">Community rules <i data-lucide="arrow-up-right"></i></a>
+
+      </section>
+
     </section>
 
     <aside class="stream-right-panel">
-      <section class="chat-widget"><div class="panel-heading"><div><span class="panel-kicker">COMMUNITY CHAT</span><h2>Live chat</h2></div><span class="chat-lock"><i data-lucide="lock"></i> 18+</span></div><div class="chat-empty"><div class="chat-orbit"><i data-lucide="messages-square"></i></div><b>Conversation starts live</b><p>Choose an active broadcast to see its chat. Messages are not fabricated or shown before a real room is active.</p></div><div class="chat-compose"><div class="chat-input-faux"><i data-lucide="message-circle"></i><span>Join a live room to chat…</span></div><button class="chat-join" id="chatJoin">JOIN CONVERSATION <i data-lucide="arrow-up-right"></i></button></div></section>
-      <section class="trending-widget"><div class="panel-heading"><div><span class="panel-kicker">WHAT'S POPULAR</span><h2>Trending</h2></div><button class="upload-mini" id="trendingUpload">UPLOAD <i data-lucide="plus"></i></button></div><div class="trending-empty"><i data-lucide="trending-up"></i><b>Nothing trending yet</b><p>Trending videos will appear after creators publish approved content.</p></div><button class="upload-wide" id="trendingUploadBottom"><i data-lucide="upload"></i> UPLOAD A VIDEO</button></section>
+
+      <section class="chat-widget">
+
+        <div class="panel-heading">
+
+          <div><span class="panel-kicker">COMMUNITY CHAT</span><h2>Live chat</h2></div>
+
+          <span class="chat-lock"><i data-lucide="lock"></i> 18+</span>
+
+        </div>
+
+        <div class="chat-empty">
+
+          <div class="chat-orbit"><i data-lucide="messages-square"></i></div>
+
+          <b>Conversation starts live</b>
+
+          <p>Choose an active broadcast to see its chat. Messages are not fabricated or shown before a real room is active.</p>
+
+        </div>
+
+        <div class="chat-compose">
+
+          <div class="chat-input-faux"><i data-lucide="message-circle"></i><span>Join a live room to chat…</span></div>
+
+          <button class="chat-join" id="chatJoin">JOIN CONVERSATION <i data-lucide="arrow-up-right"></i></button>
+
+        </div>
+
+      </section>
+
+      <section class="trending-widget">
+
+        <div class="panel-heading">
+
+          <div><span class="panel-kicker">WHAT'S POPULAR</span><h2>Trending</h2></div>
+
+          <button class="upload-mini" id="trendingUpload">UPLOAD <i data-lucide="plus"></i></button>
+
+        </div>
+
+        <div class="trending-empty">
+
+          <i data-lucide="trending-up"></i>
+
+          <b>Nothing trending yet</b>
+
+          <p>Trending videos will appear after creators publish approved content.</p>
+
+        </div>
+
+        <button class="upload-wide" id="trendingUploadBottom"><i data-lucide="upload"></i> UPLOAD A VIDEO</button>
+
+      </section>
+
       <div class="right-safety"><i data-lucide="shield-check"></i><span>Verified adults. Clear consent. Safer community.</span></div>
+
     </aside>
+
   </main>
 
   <section class="dashboard section-wrap hidden" id="dashboard">
-    <div class="dashboard-head"><div><p class="eyebrow">YOUR PRIVATE SPACE</p><h2>Creator <em>dashboard.</em></h2><p class="muted" id="dashboardEmail"></p><p class="form-message" id="creatorReviewStatus" role="status">Checking creator review status…</p></div><button class="btn btn-outline btn-small" id="signOut">Sign out</button></div>
+
+    <div class="dashboard-head">
+
+      <div>
+
+        <p class="eyebrow">YOUR PRIVATE SPACE</p>
+
+        <h2>Creator <em>dashboard.</em></h2>
+
+        <p class="muted" id="dashboardEmail"></p>
+
+        <p class="form-message" id="creatorReviewStatus" role="status">Checking creator review status…</p>
+
+      </div>
+
+      <button class="btn btn-outline btn-small" id="signOut">Sign out</button>
+
+    </div>
+
     <div class="dashboard-grid">
-      <div class="panel profile-panel"><p class="eyebrow">PROFILE DETAILS</p><form id="profileForm"><label>Display name<input name="display_name" id="displayName" maxlength="60" required placeholder="Your creator name"></label><label>Short bio<textarea name="bio" id="bio" maxlength="500" rows="4" placeholder="Tell members about yourself..."></textarea></label><label>Country<input name="country" id="country" maxlength="80" placeholder="Your country"></label><button class="btn btn-gold" type="submit">Save profile</button><p class="form-message" id="profileMessage"></p></form></div>
-      <div class="panel"><p class="eyebrow">MEMBERSHIP IDEAS</p><h3>Create a tier</h3><p class="tiny muted">Prices are displayed as ideas only. Payments and paid subscriptions are not connected yet.</p><form id="tierForm"><label>Tier name<input name="tier_name" required maxlength="40" placeholder="e.g. Supporter"></label><label>Description<textarea name="description" rows="2" maxlength="300" placeholder="What does this tier include?"></textarea></label><label>Monthly price (USD)<input name="price" type="number" min="0" step="0.01" required placeholder="5.00"></label><button class="btn btn-outline" type="submit">Add tier</button><p class="form-message" id="tierMessage"></p></form><div id="tierList" class="compact-list"></div></div>
-      <div class="panel"><p class="eyebrow">PRIVATE VIDEO UPLOADS</p><h3>Upload a video</h3><p class="tiny muted">MP4, WebM or MOV · maximum 50 MB. Uploads are private and cannot be viewed publicly until moderation approval. Only content featuring verified, consenting adults is permitted.</p><form id="mediaForm"><label>Choose video file<input name="media_file" type="file" accept="video/mp4,video/webm,video/quicktime" required></label><label class="check-line dark-check"><input type="checkbox" name="consent" required> I confirm I own or am authorised to share this video and have documented, informed consent from every identifiable adult shown.</label><button class="btn btn-outline" type="submit">Upload privately for review</button><p class="form-message" id="mediaMessage"></p></form><div id="mediaList" class="compact-list"></div></div>
+
+      <div class="panel profile-panel">
+
+        <p class="eyebrow">PROFILE DETAILS</p>
+
+        <form id="profileForm">
+
+          <label>Display name<input name="display_name" id="displayName" maxlength="60" required placeholder="Your creator name"></label>
+
+          <label>Short bio<textarea name="bio" id="bio" maxlength="500" rows="4" placeholder="Tell members about yourself..."></textarea></label>
+
+          <label>Country<input name="country" id="country" maxlength="80" placeholder="Your country"></label>
+
+          <button class="btn btn-gold" type="submit">Save profile</button>
+
+          <p class="form-message" id="profileMessage"></p>
+
+        </form>
+
+      </div>
+
+      <div class="panel">
+
+        <p class="eyebrow">MEMBERSHIP IDEAS</p>
+
+        <h3>Create a tier</h3>
+
+        <p class="tiny muted">Prices are displayed as ideas only. Payments and paid subscriptions are not connected yet.</p>
+
+        <form id="tierForm">
+
+          <label>Tier name<input name="tier_name" required maxlength="40" placeholder="e.g. Supporter"></label>
+
+          <label>Description<textarea name="description" rows="2" maxlength="300" placeholder="What does this tier include?"></textarea></label>
+
+          <label>Monthly price (USD)<input name="price" type="number" min="0" step="0.01" required placeholder="5.00"></label>
+
+          <button class="btn btn-outline" type="submit">Add tier</button>
+
+          <p class="form-message" id="tierMessage"></p>
+
+        </form>
+
+        <div id="tierList" class="compact-list"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <p class="eyebrow">PRIVATE VIDEO UPLOADS</p>
+
+        <h3>Upload a video</h3>
+
+        <p class="tiny muted">MP4, WebM or MOV · maximum 50 MB. Uploads are private and cannot be viewed publicly until moderation approval. Only content featuring verified, consenting adults is permitted.</p>
+
+        <form id="mediaForm">
+
+          <label>Choose video file<input name="media_file" type="file" accept="video/mp4,video/webm,video/quicktime" required></label>
+
+          <label class="check-line dark-check"><input type="checkbox" name="consent" required> I confirm I own or am authorised to share this video and have documented, informed consent from every identifiable adult shown.</label>
+
+          <button class="btn btn-outline" type="submit">Upload privately for review</button>
+
+          <p class="form-message" id="mediaMessage"></p>
+
+        </form>
+
+        <div id="mediaList" class="compact-list"></div>
+
+      </div>
+
     </div>
+
     <section class="panel admin-panel hidden" id="adminPanel" aria-labelledby="adminTitle">
-      <p class="eyebrow">OWNER ONLY · PRIVATE MODERATION</p><h2 id="adminTitle">Creator approval <em>queue.</em></h2>
+
+      <p class="eyebrow">OWNER ONLY · PRIVATE MODERATION</p>
+
+      <h2 id="adminTitle">Creator approval <em>queue.</em></h2>
+
       <p class="tiny muted">Review age evidence, identity evidence and documented consent using your secure verification process before checking any box. Do not upload or store identity documents in this dashboard.</p>
+
       <p class="form-message" id="adminMessage" role="status">Checking administrator access…</p>
+
       <div id="adminQueue" class="admin-queue"><p class="tiny">Loading creator applications…</p></div>
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090909">
-  <meta name="description" content="WEAR CONDOM — an 18+ creator community for confident connection, creator profiles, memberships and sexual wellness education.">
-  <title>WEAR CONDOM — Adult Social Club</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script defer src="app.js"></script>
-</head>
-<body>
-  <div class="age-screen" id="ageGate" aria-modal="true" role="dialog">
-    <div class="age-card">
-      <div class="brand-mark">WC<span>•</span></div>
-      <p class="eyebrow">PRIVATE MEMBERS COMMUNITY</p>
-      <h1>Adults only.<br><em>Always.</em></h1>
-      <p class="muted">WEAR CONDOM is an 18+ social platform. You must be at least 18 years old to enter. Respect, consent and safer choices come first.</p>
-      <label class="check-line"><input type="checkbox" id="ageConfirm"> I confirm that I am 18 years of age or older.</label>
-      <button class="btn btn-gold full" id="enterSite" disabled>ENTER THE COMMUNITY <span>↗</span></button>
-      <p class="tiny">By entering, you agree to our <a href="legal.html">community rules and terms</a>.</p>
-      <button class="exit-link" id="leaveSite">I am under 18 — leave</button>
-    </div>
-  </div>
 
-  <header class="stream-topbar">
-    <div class="stream-brand-area">
-      <button class="icon-button mobile-menu" id="menuToggle" aria-label="Open menu"><i data-lucide="menu"></i></button>
-      <a class="stream-brand" href="#home"><span class="brand-play"><i data-lucide="play"></i></span><span>WEAR<span class="brand-hot">CONDOM</span></span></a>
-    </div>
-    <form class="stream-search" id="streamSearch"><i data-lucide="search"></i><input id="streamSearchInput" type="search" placeholder="Search videos, creators and live rooms" aria-label="Search"><kbd>⌘ K</kbd></form>
-    <div class="stream-top-actions"><span id="userChip" class="sr-only">18+ COMMUNITY</span><button class="upload-top" id="creatorJoin"><i data-lucide="upload"></i><span>UPLOAD</span></button><button class="icon-button" id="openAuth" aria-label="Sign in"><i data-lucide="user-round"></i></button><button class="join-top" id="joinTop">Join</button></div>
-  </header>
+      <div id="adminMediaQueue" class="admin-queue"></div>
 
-  <main id="home" class="stream-app">
-    <aside class="stream-left-rail">
-      <nav class="rail-nav" aria-label="Main navigation">
-        <a class="rail-link active" href="#home"><i data-lucide="house"></i><span>Home</span></a>
-        <a class="rail-link" href="#clips"><i data-lucide="clapperboard"></i><span>Clips</span></a>
-        <a class="rail-link" href="#live-now"><i data-lucide="radio-tower"></i><span>Live</span></a>
-        <a class="rail-link" href="#creators"><i data-lucide="users"></i><span>Creators</span></a>
-        <a class="rail-link" href="#videos"><i data-lucide="play-square"></i><span>Library</span></a>
-        <a class="rail-link" href="#history"><i data-lucide="history"></i><span>History</span></a>
-        <div class="rail-divider"></div>
-        <button class="rail-link rail-button" id="openSettings"><i data-lucide="settings"></i><span>Settings</span></button>
-      </nav>
-      <div class="rail-bottom"><span class="rail-18">18+</span><small>Adults only<br>Consent first</small></div>
-    </aside>
-
-    <section class="stream-center">
-      <div class="feed-heading"><div><p class="stream-eyebrow"><span class="pulse-dot"></span> REAL-TIME BROADCASTS</p><h1>Live <span>now.</span></h1></div><a class="see-all" href="live.html">Open live studio <i data-lucide="arrow-up-right"></i></a></div>
-      <section class="live-slot-grid" id="live-now" aria-label="Live broadcasts">
-        <article class="live-slot slot-one"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="radio-tower"></i></span><span class="slot-caption">BROADCAST SLOT 01</span></div><div class="slot-info"><b>No active broadcast</b><small>First approved creator will appear here</small></div></article>
-        <article class="live-slot slot-two"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="headphones"></i></span><span class="slot-caption">BROADCAST SLOT 02</span></div><div class="slot-info"><b>Waiting for a creator</b><small>Live channels are not populated with demo accounts</small></div></article>
-        <article class="live-slot slot-three"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="video"></i></span><span class="slot-caption">BROADCAST SLOT 03</span></div><div class="slot-info"><b>Coming up live</b><small>Verified broadcasts only</small></div></article>
-        <article class="live-slot slot-four"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="sparkles"></i></span><span class="slot-caption">BROADCAST SLOT 04</span></div><div class="slot-info"><b>Your next live channel</b><small>Be the first to go live</small></div></article>
-      </section>
-
-      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">CURATED FOR THE COMMUNITY</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
-      <section class="video-empty-grid" id="clips" aria-label="Videos">
-        <article class="video-empty-card"><div class="video-empty-art art-a"><i data-lucide="play-circle"></i><span>VIDEO LIBRARY</span></div><b>Published videos will appear here</b><small>Creator uploads are reviewed before publication.</small></article>
-        <article class="video-empty-card"><div class="video-empty-art art-b"><i data-lucide="clapperboard"></i><span>CREATOR CLIPS</span></div><b>Discover new clips</b><small>No public clips are available yet.</small></article>
-        <article class="video-empty-card"><div class="video-empty-art art-c"><i data-lucide="film"></i><span>ON DEMAND</span></div><b>Watch on your schedule</b><small>Approved videos will be listed here.</small></article>
-        <article class="video-empty-card"><div class="video-empty-art art-d"><i data-lucide="sparkles"></i><span>FRESH CONTENT</span></div><b>New creator content</b><small>Real creators only. No fictional profiles.</small></article>
-      </section>
-
-      <section class="creator-strip" id="creators"><div class="feed-heading"><div><p class="stream-eyebrow">COMMUNITY CHANNELS</p><h2>Creator <span>channels.</span></h2></div><button class="text-action" id="videoJoin">Become a creator <i data-lucide="arrow-up-right"></i></button></div><div class="creator-grid" id="creatorGrid"><div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div></div></section>
-      <section class="wellness-mini" id="wellness"><div><p class="stream-eyebrow">SAFETY & WELLNESS</p><h3>Good experiences start with <span>respect.</span></h3><p>Learn about consent, privacy and safer choices.</p></div><a href="legal.html">Community rules <i data-lucide="arrow-up-right"></i></a></section>
     </section>
 
-    <aside class="stream-right-panel">
-      <section class="chat-widget"><div class="panel-heading"><div><span class="panel-kicker">COMMUNITY CHAT</span><h2>Live chat</h2></div><span class="chat-lock"><i data-lucide="lock"></i> 18+</span></div><div class="chat-empty"><div class="chat-orbit"><i data-lucide="messages-square"></i></div><b>Conversation starts live</b><p>Choose an active broadcast to see its chat. Messages are not fabricated or shown before a real room is active.</p></div><div class="chat-compose"><div class="chat-input-faux"><i data-lucide="message-circle"></i><span>Join a live room to chat…</span></div><button class="chat-join" id="chatJoin">JOIN CONVERSATION <i data-lucide="arrow-up-right"></i></button></div></section>
-      <section class="trending-widget"><div class="panel-heading"><div><span class="panel-kicker">WHAT'S POPULAR</span><h2>Trending</h2></div><button class="upload-mini" id="trendingUpload">UPLOAD <i data-lucide="plus"></i></button></div><div class="trending-empty"><i data-lucide="trending-up"></i><b>Nothing trending yet</b><p>Trending videos will appear after creators publish approved content.</p></div><button class="upload-wide" id="trendingUploadBottom"><i data-lucide="upload"></i> UPLOAD A VIDEO</button></section>
-      <div class="right-safety"><i data-lucide="shield-check"></i><span>Verified adults. Clear consent. Safer community.</span></div>
-    </aside>
-  </main>
-
-  <section class="dashboard section-wrap hidden" id="dashboard">
-    <div class="dashboard-head"><div><p class="eyebrow">YOUR PRIVATE SPACE</p><h2>Creator <em>dashboard.</em></h2><p class="muted" id="dashboardEmail"></p><p class="form-message" id="creatorReviewStatus" role="status">Checking creator review status…</p></div><button class="btn btn-outline btn-small" id="signOut">Sign out</button></div>
-    <div class="dashboard-grid">
-      <div class="panel profile-panel"><p class="eyebrow">PROFILE DETAILS</p><form id="profileForm"><label>Display name<input name="display_name" id="displayName" maxlength="60" required placeholder="Your creator name"></label><label>Short bio<textarea name="bio" id="bio" maxlength="500" rows="4" placeholder="Tell members about yourself..."></textarea></label><label>Country<input name="country" id="country" maxlength="80" placeholder="Your country"></label><button class="btn btn-gold" type="submit">Save profile</button><p class="form-message" id="profileMessage"></p></form></div>
-      <div class="panel"><p class="eyebrow">MEMBERSHIP IDEAS</p><h3>Create a tier</h3><p class="tiny muted">Prices are displayed as ideas only. Payments and paid subscriptions are not connected yet.</p><form id="tierForm"><label>Tier name<input name="tier_name" required maxlength="40" placeholder="e.g. Supporter"></label><label>Description<textarea name="description" rows="2" maxlength="300" placeholder="What does this tier include?"></textarea></label><label>Monthly price (USD)<input name="price" type="number" min="0" step="0.01" required placeholder="5.00"></label><button class="btn btn-outline" type="submit">Add tier</button><p class="form-message" id="tierMessage"></p></form><div id="tierList" class="compact-list"></div></div>
-      <div class="panel"><p class="eyebrow">PRIVATE VIDEO UPLOADS</p><h3>Upload a video</h3><p class="tiny muted">MP4, WebM or MOV · maximum 50 MB. Uploads are private and cannot be viewed publicly until moderation approval. Only content featuring verified, consenting adults is permitted.</p><form id="mediaForm"><label>Choose video file<input name="media_file" type="file" accept="video/mp4,video/webm,video/quicktime" required></label><label class="check-line dark-check"><input type="checkbox" name="consent" required> I confirm I own or am authorised to share this video and have documented, informed consent from every identifiable adult shown.</label><button class="btn btn-outline" type="submit">Upload privately for review</button><p class="form-message" id="mediaMessage"></p></form><div id="mediaList" class="compact-list"></div></div>
-    </div>
-    <section class="panel admin-panel hidden" id="adminPanel" aria-labelledby="adminTitle">
-      <p class="eyebrow">OWNER ONLY · PRIVATE MODERATION</p><h2 id="adminTitle">Creator approval <em>queue.</em></h2>
-      <p class="tiny muted">Review age evidence, identity evidence and documented consent using your secure verification process before checking any box. Do not upload or store identity documents in this dashboard.</p>
-      <p class="form-message" id="adminMessage" role="status">Checking administrator access…</p>
-      <div id="adminQueue" class="admin-queue"><p class="tiny">Loading creator applications…</p></div>
-    </section>
     <p class="dashboard-footnote">Your account is not publicly listed until your profile is reviewed and approved. Never upload content involving minors, coercion, non-consensual imagery or anyone whose age cannot be verified.</p>
+
   </section>
 
-  <section class="hidden" id="articles"><div id="articleGrid"></div></section>
-    <footer class="stream-footer"><div class="footer-brand"><span class="brand-mark small">WC<span>•</span></span><b>WEAR CONDOM</b></div><p>18+ only · Consent first · Respect always</p><div><a href="legal.html">Terms & safety</a><a href="#wellness">Wellness</a><a href="mailto:support@wearcondom.com">Contact</a></div><small>© <span id="year"></span> WEAR CONDOM</small></footer>
+  <section class="hidden" id="articles">
 
-  <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="modal-card"><button class="modal-close" id="closeAuth" aria-label="Close">×</button><p class="eyebrow">WELCOME TO THE CLUB</p><h2 id="authTitle">Create your <em>account.</em></h2>
-      <div class="auth-tabs"><button class="active" data-mode="signup">Join free</button><button data-mode="signin">Sign in</button></div>
-      <form id="authForm"><div id="nameField"><label>Display name<input name="display_name" id="authName" maxlength="60" placeholder="Your name or creator name"></label></div><label>Email address<input name="email" id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input name="password" id="authPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></label><label class="check-line dark-check" id="adultConsent"><input type="checkbox" id="adultCheckbox"> I am 18 or older and agree to the community rules.</label><button class="btn btn-gold full" id="authSubmit" type="submit">Create account ↗</button><p class="form-message" id="authMessage"></p></form>
-      <p class="tiny muted">By continuing, you agree to our <a href="legal.html">terms, privacy and safety rules</a>.</p>
-    </div>
-  </div>
-  <div class="toast" id="toast" role="status"></div>
-<script>
-  document.addEventListener('DOMContentLoaded',()=>{if(window.lucide)lucide.createIcons();
-    const auth=()=>document.getElementById('joinTop')?.click();
-['chatJoin'].forEach(id=>document.getElementById(id)?.addEventListener('click',auth));
-    document.getElementById('openSettings')?.addEventListener('click',auth);
-    document.getElementById('streamSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('streamSearchInput').value.trim().toLowerCase();const cards=[...document.querySelectorAll('.video-empty-card,.creator-card')];let found=0;cards.forEach(c=>{const ok=!q||c.textContent.toLowerCase().includes(q);c.style.display=ok?'':'none';if(ok)found++;});if(q&&!found)document.getElementById('streamSearchInput').placeholder='No matching published content yet';});
-    document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');}));
-  });
-</script>
-</body>
-</html>
-    <p class="dashboard-footnote">Your account is not publicly listed until your profile is reviewed and approved. Never upload content involving minors, coercion, non-consensual imagery or anyone whose age cannot be verified.</p>
+    <div id="articleGrid"></div>
+
   </section>
 
-  <section class="hidden" id="articles"><div id="articleGrid"></div></section>
-    <footer class="stream-footer"><div class="footer-brand"><span class="brand-mark small">WC<span>•</span></span><b>WEAR CONDOM</b></div><p>18+ only · Consent first · Respect always</p><div><a href="legal.html">Terms & safety</a><a href="#wellness">Wellness</a><a href="mailto:support@wearcondom.com">Contact</a></div><small>© <span id="year"></span> WEAR CONDOM</small></footer>
+  <footer class="stream-footer">
+
+    <div class="footer-brand"><span class="brand-mark small">WC<span>•</span></span><b>WEAR CONDOM</b></div>
+
+    <p>18+ only · Consent first · Respect always</p>
+
+    <div>
+
+      <a href="legal.html">Terms & safety</a>
+
+      <a href="#wellness">Wellness</a>
+
+      <a href="mailto:support@wearcondom.com">Contact</a>
+
+    </div>
+
+    <small>© <span id="year"></span> WEAR CONDOM</small>
+
+  </footer>
+  
 
   <div class="modal hidden" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="modal-card"><button class="modal-close" id="closeAuth" aria-label="Close">×</button><p class="eyebrow">WELCOME TO THE CLUB</p><h2 id="authTitle">Create your <em>account.</em></h2>
-      <div class="auth-tabs"><button class="active" data-mode="signup">Join free</button><button data-mode="signin">Sign in</button></div>
-      <form id="authForm"><div id="nameField"><label>Display name<input name="display_name" id="authName" maxlength="60" placeholder="Your name or creator name"></label></div><label>Email address<input name="email" id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input name="password" id="authPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></label><label class="check-line dark-check" id="adultConsent"><input type="checkbox" id="adultCheckbox"> I am 18 or older and agree to the community rules.</label><button class="btn btn-gold full" id="authSubmit" type="submit">Create account ↗</button><p class="form-message" id="authMessage"></p></form>
+
+    <div class="modal-card">
+
+      <button class="modal-close" id="closeAuth" aria-label="Close">×</button>
+
+      <p class="eyebrow">WELCOME TO THE CLUB</p>
+
+      <h2 id="authTitle">Create your <em>account.</em></h2>
+
+      <div class="auth-tabs">
+
+        <button class="active" data-mode="signup">Join free</button>
+
+        <button data-mode="signin">Sign in</button>
+
+      </div>
+
+      <form id="authForm">
+
+        <div id="nameField">
+
+          <label>Display name<input name="display_name" id="authName" maxlength="60" placeholder="Your name or creator name"></label>
+
+        </div>
+
+        <label>Email address<input name="email" id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+
+        <label>Password<input name="password" id="authPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></label>
+
+        <label class="check-line dark-check" id="adultConsent"><input type="checkbox" id="adultCheckbox"> I am 18 or older and agree to the community rules.</label>
+
+        <button class="btn btn-gold full" id="authSubmit" type="submit">Create account ↗</button>
+
+        <p class="form-message" id="authMessage"></p>
+
+      </form>
+
       <p class="tiny muted">By continuing, you agree to our <a href="legal.html">terms, privacy and safety rules</a>.</p>
+
     </div>
+
   </div>
+
   <div class="toast" id="toast" role="status"></div>
-<script>
-  document.addEventListener('DOMContentLoaded',()=>{if(window.lucide)lucide.createIcons();
-    const auth=()=>document.getElementById('joinTop')?.click();
-['chatJoin'].forEach(id=>document.getElementById(id)?.addEventListener('click',auth));
-    document.getElementById('openSettings')?.addEventListener('click',auth);
-    document.getElementById('streamSearch')?.addEventListener('submit',e=>{e.preventDefault();const q=document.getElementById('streamSearchInput').value.trim().toLowerCase();const cards=[...document.querySelectorAll('.video-empty-card,.creator-card')];let found=0;cards.forEach(c=>{const ok=!q||c.textContent.toLowerCase().includes(q);c.style.display=ok?'':'none';if(ok)found++;});if(q&&!found)document.getElementById('streamSearchInput').placeholder='No matching published content yet';});
-    document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');}));
-  });
-</script>
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      if (window.lucide) lucide.createIcons();
+
+      const auth = () => document.getElementById('joinTop')?.click();
+
+      ['chatJoin'].forEach(id => {
+
+        document.getElementById(id)?.addEventListener('click', auth);
+
+      });
+
+      document.getElementById('openSettings')?.addEventListener('click', auth);
+
+      document.getElementById('streamSearch')?.addEventListener('submit', e => {
+
+        e.preventDefault();
+
+        const q = document.getElementById('streamSearchInput').value.trim().toLowerCase();
+
+        const cards = [...document.querySelectorAll('.video-empty-card,.creator-card')];
+
+        let found = 0;
+
+        cards.forEach(c => {
+
+          const ok = !q || c.textContent.toLowerCase().includes(q);
+
+          c.style.display = ok ? '' : 'none';
+
+          if (ok) found++;
+
+        });
+
+        if (q && !found) {
+
+          document.getElementById('streamSearchInput').placeholder = 'No matching published content yet';
+
+        }
+
+      });
+
+      document.querySelectorAll('.filter-chip').forEach(b => {
+
+        b.addEventListener('click', () => {
+
+          document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('selected'));
+
+          b.classList.add('selected');
+
+        });
+
+      });
+
+    });
+
+  </script>
+
 </body>
+
 </html>
