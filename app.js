@@ -185,15 +185,15 @@
   async function loadPublicVideos(){
     const host=$("#clips");
     if(!host||!sb)return;
-    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,title,created_at").eq("media_type","video").eq("moderation_status","approved").eq("storage_bucket","published-videos").order("created_at",{ascending:false}).limit(12);
-    if(error){console.warn("Could not load published videos:",error);return;}
-    if(!data?.length)return;
+    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,title,created_at").eq("media_type","video").eq("moderation_status","approved").eq("storage_bucket","published-videos").order("created_at",{ascending:false}).limit(50);
+    if(error){console.warn("Could not load published videos:",error);host.innerHTML='<p class="empty-state">Videos could not be loaded right now. Please try again later.</p>';return;}
+    if(!data?.length){host.innerHTML='';window.applyWearFeedFilter?.();return;}
     const creatorIds=[...new Set(data.map(v=>v.creator_id).filter(Boolean))];
     const profiles=await sb.from("adult_creator_profiles").select("id,display_name,country,moderation_status,is_adult_verified,identity_verified,consent_reviewed").in("id",creatorIds);
     if(profiles.error){console.warn("Could not verify video creators:",profiles.error);return;}
     const approved=new Map((profiles.data||[]).filter(p=>p.moderation_status==="approved"&&p.is_adult_verified===true&&p.identity_verified===true&&p.consent_reviewed===true).map(p=>[p.id,p]));
     const rows=data.filter(v=>approved.has(v.creator_id));
-    if(!rows.length)return;
+    if(!rows.length){host.innerHTML='';window.applyWearFeedFilter?.();return;}
     host.innerHTML=rows.map(v=>{
       const creator=approved.get(v.creator_id);
       const publicUrl=sb.storage.from("published-videos").getPublicUrl(v.media_url).data?.publicUrl;
