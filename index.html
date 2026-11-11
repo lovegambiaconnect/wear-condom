@@ -159,7 +159,7 @@
 
       </section>
 
-      <section class="wellness-mini" id="wellness">
+      <section class="watch-history-section" id="history" aria-label="Watch history"><div class="feed-heading"><div><p class="stream-eyebrow">YOUR RECENT ACTIVITY</p><h2>Watch <span>history.</span></h2></div><button class="text-action" type="button" id="clearWatchHistory">Clear history</button></div><div class="watch-history-list" id="watchHistoryList"><div class="empty-state">Videos you play will appear here on this device.</div></div></section><section class="wellness-mini" id="wellness">
 
         <div>
 
@@ -464,7 +464,51 @@
 
       });
 
-      document.getElementById('openSettings')?.addEventListener('click', auth);
+      document.getElementById('openSettings')?.addEventListener('click', () => document.getElementById('openAuth')?.click());
+        const appShell = document.querySelector('.stream-app');
+        const menuToggle = document.getElementById('menuToggle');
+        menuToggle?.addEventListener('click', () => {
+          const open = appShell?.classList.toggle('menu-open');
+          menuToggle.setAttribute('aria-expanded', String(!!open));
+          menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        });
+        document.querySelectorAll('.rail-nav a.rail-link').forEach(link => link.addEventListener('click', () => {
+          document.querySelectorAll('.rail-nav a.rail-link').forEach(item => item.classList.toggle('active', item === link));
+          appShell?.classList.remove('menu-open');
+          menuToggle?.setAttribute('aria-expanded', 'false');
+        }));
+        const historyKey = 'wear_condom_watch_history_v1';
+        const historyHost = document.getElementById('watchHistoryList');
+        const escapeHistory = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const readHistory = () => { try { return JSON.parse(localStorage.getItem(historyKey) || '[]').filter(item => item && item.url); } catch (_) { return []; } };
+        const renderHistory = () => {
+          if (!historyHost) return;
+          const items = readHistory();
+          if (!items.length) { historyHost.innerHTML = '<div class="empty-state">Videos you play will appear here on this device.</div>'; return; }
+          historyHost.innerHTML = items.map(item => '<article class="watch-history-item"><div><b>' + escapeHistory(item.title || 'Video') + '</b><small>' + escapeHistory(item.creator || 'Creator') + ' · ' + escapeHistory(new Date(item.watchedAt || Date.now()).toLocaleString()) + '</small></div><a class="text-action" href="#clips" data-history-url="' + encodeURIComponent(item.url) + '">Watch again</a></article>').join('');
+        };
+        document.addEventListener('play', event => {
+          const video = event.target;
+          if (!(video instanceof HTMLVideoElement) || !video.closest('#clips')) return;
+          const card = video.closest('.video-published-card');
+          const item = {url: video.currentSrc || video.src, title: card?.querySelector('.tiny')?.textContent || 'Video', creator: card?.querySelector('b')?.textContent || 'Creator', watchedAt: Date.now()};
+          const items = readHistory().filter(old => old.url !== item.url);
+          items.unshift(item);
+          try { localStorage.setItem(historyKey, JSON.stringify(items.slice(0, 30))); } catch (_) {}
+          renderHistory();
+        }, true);
+        historyHost?.addEventListener('click', event => {
+          const link = event.target.closest('[data-history-url]');
+          if (!link) return;
+          const url = decodeURIComponent(link.dataset.historyUrl || '');
+          const video = [...document.querySelectorAll('#clips video')].find(item => (item.currentSrc || item.src) === url);
+          if (video) { video.scrollIntoView({behavior:'smooth', block:'center'}); video.play().catch(() => {}); }
+        });
+        document.getElementById('clearWatchHistory')?.addEventListener('click', () => {
+          try { localStorage.removeItem(historyKey); } catch (_) {}
+          renderHistory();
+        });
+        renderHistory();
 
       document.getElementById('streamSearch')?.addEventListener('submit', e => {
 
