@@ -117,6 +117,7 @@
           msg("#adminMessage","Video rejected. It remains private and is not publicly accessible.");
         }
         await loadAdminMediaQueue();
+        if(action==="approve")await loadPublicVideos();
       });
     }
   }
@@ -171,7 +172,7 @@
     if(data?.session?.user) currentUser=data.session.user;
     updateAuthUI();
     resolveAuthReady();
-    await loadCreators(); await loadArticles();
+    await loadCreators(); await loadPublicVideos(); await loadArticles();
   }
   function updateAuthUI(){
     $("#userChip").textContent=currentUser?(currentUser.email||"MEMBER"):"18+ COMMUNITY";
@@ -180,6 +181,26 @@
     $("#joinTop").classList.toggle("hidden",!!currentUser);
     $("#dashboard").classList.toggle("hidden",!currentUser);
     if(currentUser){$("#dashboardEmail").textContent=currentUser.email||"";$("#dashboard").scrollIntoView({behavior:"smooth",block:"start"});loadDashboard();}
+  }
+  async function loadPublicVideos(){
+    const host=$("#clips");
+    if(!host||!sb)return;
+    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,created_at").eq("media_type","video").eq("moderation_status","approved").eq("storage_bucket","published-videos").order("created_at",{ascending:false}).limit(12);
+    if(error){console.warn("Could not load published videos:",error);return;}
+    if(!data?.length)return;
+    const creatorIds=[...new Set(data.map(v=>v.creator_id).filter(Boolean))];
+    const profiles=await sb.from("adult_creator_profiles").select("id,display_name,country,moderation_status,is_adult_verified,identity_verified,consent_reviewed").in("id",creatorIds);
+    if(profiles.error){console.warn("Could not verify video creators:",profiles.error);return;}
+    const approved=new Map((profiles.data||[]).filter(p=>p.moderation_status==="approved"&&p.is_adult_verified===true&&p.identity_verified===true&&p.consent_reviewed===true).map(p=>[p.id,p]));
+    const rows=data.filter(v=>approved.has(v.creator_id));
+    if(!rows.length)return;
+    host.innerHTML=rows.map(v=>{
+      const creator=approved.get(v.creator_id);
+      const publicUrl=sb.storage.from("published-videos").getPublicUrl(v.media_url).data?.publicUrl;
+      if(!publicUrl)return "";
+      const date=v.created_at?new Date(v.created_at).toLocaleDateString():"";
+      return '<article class="video-empty-card video-published-card"><video controls playsinline preload="metadata" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #29293e;border-radius:13px;background:#080808" src="'+escapeHtml(publicUrl)+'"></video><b>'+escapeHtml(creator.display_name||"Verified creator")+'</b><small>'+escapeHtml(creator.country||"Community")+(date?" · "+escapeHtml(date):"")+'</small></article>';
+    }).filter(Boolean).join("");
   }
   async function loadCreators(){
     const grid=$("#creatorGrid");
