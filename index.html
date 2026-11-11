@@ -471,7 +471,14 @@
           railLinks.forEach(link => link.classList.remove('active'));
           settingsButton.classList.add('active');
           setSidebarOpen(false);
-          document.getElementById('openAuth')?.click();
+          const dashboard = document.getElementById('dashboard');
+          const profileDetails = document.getElementById('profileDetails');
+          if (dashboard && !dashboard.classList.contains('hidden')) {
+            if (profileDetails) profileDetails.open = true;
+            (profileDetails || dashboard).scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            document.getElementById('openAuth')?.click();
+          }
         });
         const historyKey = 'wear_condom_watch_history_v1';
         const historyHost = document.getElementById('watchHistoryList');
@@ -576,9 +583,6 @@
             item.setAttribute('aria-pressed', String(selected));
           });
           window.applyWearFeedFilter();
-        });
-      });
-      window.applyWearFeedFilter();
         });
       });
       window.applyWearFeedFilter();
