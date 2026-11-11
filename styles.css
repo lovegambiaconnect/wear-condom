@@ -137,3 +137,10 @@ html{scroll-behavior:smooth;background:var(--stream-bg)}body{margin:0;background
 @media(max-width:620px){.watch-history-item{align-items:flex-start;padding:11px;gap:8px}.watch-history-item .text-action{font-size:10px}}
 
 [hidden]{display:none!important}
+
+/* Wear Condom signature emblem — branding only */
+.condom-logo-icon{width:27px;height:27px;display:block;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px #ff4fa366)}
+.brand-mark .condom-logo-icon{width:39px;height:39px;color:#fff}.brand-mark.small .condom-logo-icon{width:25px;height:25px}.brand-play{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#ff4fa3,#9d246c);box-shadow:0 0 22px #ff4fa344}.brand-play .condom-logo-icon{width:29px;height:29px;color:#fff}
+.rail-brand{width:52px;height:52px;margin:0 auto 17px;display:grid;place-items:center;border:1px solid #62304f;border-radius:16px;background:linear-gradient(145deg,#32172d,#171321);color:#ff8bc0;box-shadow:0 8px 25px #ff3f9d20}.rail-brand .condom-logo-icon{width:34px;height:34px}
+.stream-left-rail{justify-content:flex-start}.stream-left-rail .rail-bottom{margin-top:auto}
+@media(max-width:620px){.rail-brand{width:46px;height:46px;margin-bottom:12px}.rail-brand .condom-logo-icon{width:30px;height:30px}}
