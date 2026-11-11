@@ -95,6 +95,169 @@
       const id=escapeHtml(p.id); const ready=p.is_adult_verified&&p.identity_verified&&p.consent_reviewed;
       return '<article class="admin-creator" data-creator="'+id+'"><div class="admin-creator-head"><div><h3>'+escapeHtml(p.display_name||'Creator')+'</h3><p class="tiny">'+escapeHtml(p.country||'Country not provided')+' Â· Joined '+(p.created_at?new Date(p.created_at).toLocaleDateString():'date unavailable')+'</p><p class="tiny">Account ID: '+id.slice(0,8)+'â¦</p></div><span class="admin-status">'+escapeHtml(p.moderation_status||'pending')+'</span></div><div class="admin-checks"><label><input type="checkbox" data-field="is_adult_verified" '+(p.is_adult_verified?'checked':'')+'> Age evidence reviewed</label><label><input type="checkbox" data-field="identity_verified" '+(p.identity_verified?'checked':'')+'> Identity evidence reviewed</label><label><input type="checkbox" data-field="consent_reviewed" '+(p.consent_reviewed?'checked':'')+'> Consent evidence reviewed</label></div><p class="tiny">Approval requires all three checks. Only mark a check after completing the relevant evidence review.</p><div class="admin-actions"><button class="btn btn-outline btn-small" data-action="save-checks">Save verification checks</button><button class="btn btn-gold btn-small" data-action="approve" '+(ready?'':'disabled')+'>Approve creator</button><button class="btn btn-outline btn-small" data-action="reject">Reject application</button></div></article>';
     }).join('');
+    async function loadAdminMediaQueue(){
+    const host=$("#adminMediaQueue");
+    if(!host||!sb)return;
+
+    const {data,error}=await sb
+      .from("adult_creator_media")
+      .select("id,creator_id,title,media_url,media_type,created_at,moderation_status,storage_bucket")
+      .eq("media_type","video")
+      .eq("moderation_status","pending")
+      .eq("storage_bucket","creator-videos")
+      .order("created_at",{ascending:true});
+
+    if(error){
+      host.innerHTML='<p class="tiny">Could not load video submissions: '+escapeHtml(error.message)+'</p>';
+      return;
+    }
+
+    if(!data?.length){
+      host.innerHTML='<div class="empty-state">No videos are waiting for review.</div>';
+      return;
+    }
+
+    const cards=await Promise.all(data.map(async video=>{
+      const preview=await sb.storage
+        .from("creator-videos")
+        .createSignedUrl(video.media_url,3600);
+
+      const previewHtml=preview.error
+        ? '<p class="tiny">Private preview could not be loaded: '+escapeHtml(preview.error.message)+'</p>'
+        : '<video controls playsinline preload="metadata" style="width:100%;max-height:360px;border-radius:12px;background:#000" src="'+escapeHtml(preview.data.signedUrl)+'"></video>';
+
+      return '<article class="admin-creator" data-media-id="'+escapeHtml(video.id)+'">'
+        +'<div class="admin-creator-head"><div>'
+        +'<h3>'+escapeHtml(video.title||"Video submission")+'</h3>'
+        +'<p class="tiny">Creator ID: '+escapeHtml(video.creator_id).slice(0,8)+'…</p>'
+        +'<p class="tiny">Submitted: '+(video.created_at?new Date(video.created_at).toLocaleString():"Date unavailable")+'</p>'
+        +'</div><span class="admin-status">Pending</span></div>'
+        +previewHtml
+        +'<div class="admin-actions">'
+        +'<button class="btn btn-gold btn-small" data-media-action="approve">Approve video</button>'
+        +'<button class="btn btn-outline btn-small" data-media-action="reject">Reject video</button>'
+        +'</div></article>';
+    }));
+
+    host.innerHTML=cards.join("");
+  }
+
+  $("#adminMediaQueue")?.addEventListener("click",async e=>{
+    const button=e.target.closest("button[data-media-action]");
+    if(!button)return;
+
+    const card=button.closest("[data-media-id]");
+    if(!card||!currentUser)return;
+
+    const id=card.dataset.mediaId;
+    const action=button.dataset.mediaAction;
+    button.disabled=true;
+
+    try{
+      if(action==="approve"){
+        const {data:video,error:fetchError}=await sb
+          .from("adult_creator_media")
+          .select("id,media_url,storage_bucket,moderation_status")
+          .eq("id",id)
+          .eq("moderation_status","pending")
+          .eq("storage_bucket","creator-videos")
+          .single();
+
+        if(fetchError)throw fetchError;
+        if(!video)throw new Error("This video is no longer pending review.");
+
+        const {data:file,error:downloadError}=await sb.storage
+          .from("creator-videos")
+          .download(video.media_url);
+
+        if(downloadError)throw downloadError;
+
+        const {error:uploadError}=await sb.storage
+          .from("published-videos")
+          .upload(video.media_url,file,{
+            contentType:file.type||"video/mp4",
+            upsert:false
+          });
+
+        if(uploadError)throw uploadError;
+
+        const {data:reviewed,error:reviewError}=await sb.rpc("admin_review_media",{
+          p_media_id:id,
+          p_action:"approve",
+          p_storage_bucket:"published-videos"
+        });
+
+        if(reviewError){
+          await sb.storage.from("published-videos").remove([video.media_url]);
+          throw reviewError;
+        }
+
+        if(!reviewed){
+          await sb.storage.from("published-videos").remove([video.media_url]);
+          throw new Error("The approval was not confirmed. The public copy was removed.");
+        }
+
+        msg("#adminMessage","Video approved and published.");
+      }
+
+      if(action==="reject"){
+        const {data:reviewed,error}=await sb.rpc("admin_review_media",{
+          p_media_id:id,
+          p_action:"reject"
+        });
+
+        if(error)throw error;
+        if(!reviewed)throw new Error("The rejection was not confirmed.");
+
+        msg("#adminMessage","Video rejected. It will not appear in the public library.");
+      }
+
+      await loadAdminMediaQueue();
+      await loadDashboard();
+      await loadPublicVideos();
+
+    }catch(error){
+      msg("#adminMessage",error.message||"Could not review this video.",true);
+      button.disabled=false;
+    }
+  });
+
+  async function loadPublicVideos(){
+    const host=$("#clips");
+    if(!host||!sb)return;
+
+    const {data,error}=await sb
+      .from("adult_creator_media")
+      .select("id,title,media_url,created_at")
+      .eq("moderation_status","approved")
+      .eq("storage_bucket","published-videos")
+      .eq("media_type","video")
+      .order("created_at",{ascending:false});
+
+    if(error){
+      console.warn("Could not load approved videos:",error.message);
+      return;
+    }
+
+    if(!data?.length)return;
+
+    const cards=await Promise.all(data.map(async video=>{
+      const result=await sb.storage
+        .from("published-videos")
+        .createSignedUrl(video.media_url,3600);
+
+      if(result.error)return "";
+
+      return '<article class="video-empty-card">'
+        +'<div class="video-empty-art">'
+        +'<video controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover" src="'+escapeHtml(result.data.signedUrl)+'"></video>'
+        +'</div>'
+        +'<h3>'+escapeHtml(video.title||"Community video")+'</h3>'
+        +'</article>';
+    }));
+
+    const visibleCards=cards.filter(Boolean);
+    if(visibleCards.length)host.innerHTML=visibleCards.join("");
   }
   $("#adminQueue")?.addEventListener("click",async e=>{
     const button=e.target.closest("button[data-action]"); if(!button)return;
