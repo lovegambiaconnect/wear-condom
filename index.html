@@ -70,7 +70,7 @@
 
     </div>
 
-    <form class="stream-search" id="streamSearch"><i data-lucide="search"></i><input id="streamSearchInput" type="search" placeholder="Search videos, creators and live rooms" aria-label="Search"><kbd>⌘ K</kbd></form>
+    <form class="stream-search" id="streamSearch"><i data-lucide="search"></i><input id="streamSearchInput" type="search" placeholder="Search videos and creators" aria-label="Search"><kbd>⌘ K</kbd></form>
 
     <div class="stream-top-actions"><span id="userChip" class="sr-only">18+ COMMUNITY</span><button class="upload-top" id="creatorJoin"><i data-lucide="upload"></i><span>UPLOAD</span></button><button class="icon-button" id="openAuth" aria-label="Sign in"><i data-lucide="user-round"></i></button><button class="join-top" id="joinTop">Join</button></div>
 
@@ -85,8 +85,6 @@
         <a class="rail-link active" href="#home"><i data-lucide="house"></i><span>Home</span></a>
 
         <a class="rail-link" href="#clips"><i data-lucide="clapperboard"></i><span>Clips</span></a>
-
-        <a class="rail-link" href="#live-now"><i data-lucide="radio-tower"></i><span>Live</span></a>
 
         <a class="rail-link" href="#creators"><i data-lucide="users"></i><span>Creators</span></a>
 
@@ -106,21 +104,7 @@
 
     <section class="stream-center">
 
-      <div class="feed-heading"><div><p class="stream-eyebrow"><span class="pulse-dot"></span> REAL-TIME BROADCASTS</p><h1>Live <span>now.</span></h1></div><a class="see-all" href="live.html">Open live studio <i data-lucide="arrow-up-right"></i></a></div>
-
-      <section class="live-slot-grid" id="live-now" aria-label="Live broadcasts">
-
-        <article class="live-slot slot-one"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="radio-tower"></i></span><span class="slot-caption">BROADCAST SLOT 01</span></div><div class="slot-info"><b>No active broadcast</b><small>First approved creator will appear here</small></div></article>
-
-        <article class="live-slot slot-two"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="headphones"></i></span><span class="slot-caption">BROADCAST SLOT 02</span></div><div class="slot-info"><b>Waiting for a creator</b><small>Live channels are not populated with demo accounts</small></div></article>
-
-        <article class="live-slot slot-three"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="video"></i></span><span class="slot-caption">BROADCAST SLOT 03</span></div><div class="slot-info"><b>Coming up live</b><small>Verified broadcasts only</small></div></article>
-
-        <article class="live-slot slot-four"><div class="slot-art"><span class="slot-label"><i data-lucide="radio"></i> LIVE</span><span class="slot-symbol"><i data-lucide="sparkles"></i></span><span class="slot-caption">BROADCAST SLOT 04</span></div><div class="slot-info"><b>Your next live channel</b><small>Be the first to go live</small></div></article>
-
-      </section>
-
-      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">CURATED FOR THE COMMUNITY</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
+      <div class="feed-heading for-you-heading" id="videos"><div><p class="stream-eyebrow">FOR YOU</p><h2>For <span>you.</span></h2></div><div class="feed-filters"><button class="filter-chip selected">All</button><button class="filter-chip">Videos</button><button class="filter-chip">Clips</button><button class="filter-chip">Recently added</button></div></div>
 
       <section class="video-empty-grid" id="clips" aria-label="Videos">
 
@@ -132,7 +116,7 @@
 
         <article class="video-empty-card"><div class="video-empty-art art-d"><i data-lucide="sparkles"></i><span>FRESH CONTENT</span></div><b>New creator content</b><small>Real creators only. No fictional profiles.</small></article>
 
-      </section>I
+      </section>
       
 
       <section class="creator-strip" id="creators">
@@ -260,28 +244,6 @@
     </div>
 
     <div class="dashboard-grid">
-
-      <section class="panel live-studio" aria-labelledby="liveStudioTitle">
-        <div class="live-studio-head">
-          <div><p class="eyebrow">CREATOR BROADCAST</p><h3 id="liveStudioTitle">Live <em>studio.</em></h3><p class="tiny muted">Prepare your live session and check your camera before going on air.</p></div>
-          <span class="live-status-pill" id="liveStudioStatus">OFFLINE</span>
-        </div>
-        <div class="live-studio-layout">
-          <div class="live-preview-wrap">
-            <video id="liveCameraPreview" autoplay muted playsinline aria-label="Private camera preview"></video>
-            <div class="live-preview-placeholder" id="livePreviewPlaceholder"><span>◉</span><b>Your camera preview</b><small>Only you can see this preview. It is not a live broadcast.</small></div>
-          </div>
-          <div class="live-studio-controls">
-            <label>Live stream title<input id="liveStreamTitle" maxlength="100" placeholder="Give your live session a title"></label>
-            <label>About this live<textarea id="liveStreamDescription" maxlength="300" rows="3" placeholder="Tell viewers what your session is about"></textarea></label>
-            <label>Who can watch<select id="liveStreamAudience"><option value="public">Everyone (public)</option><option value="members">Signed-in members</option></select></label>
-            <div class="live-studio-actions"><button class="btn btn-outline" type="button" id="previewLiveCamera">Preview camera</button><button class="btn btn-outline" type="button" id="stopLiveCamera" disabled>Stop preview</button></div>
-            <button class="btn btn-gold live-start-disabled" type="button" id="startLiveBroadcast" disabled>Live broadcast not connected</button>
-            <p class="form-message" id="liveStudioMessage" role="status">Live broadcasting is being prepared. Your camera preview stays private; starting a public stream will unlock after the secure streaming service is connected.</p>
-          </div>
-        </div>
-      </section>
-
 
       <div class="panel profile-panel">
 
