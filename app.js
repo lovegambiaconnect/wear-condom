@@ -185,7 +185,7 @@
   async function loadPublicVideos(){
     const host=$("#clips");
     if(!host||!sb)return;
-    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,created_at").eq("media_type","video").eq("moderation_status","approved").eq("storage_bucket","published-videos").order("created_at",{ascending:false}).limit(12);
+    const {data,error}=await sb.from("adult_creator_media").select("id,creator_id,media_url,title,created_at").eq("media_type","video").eq("moderation_status","approved").eq("storage_bucket","published-videos").order("created_at",{ascending:false}).limit(12);
     if(error){console.warn("Could not load published videos:",error);return;}
     if(!data?.length)return;
     const creatorIds=[...new Set(data.map(v=>v.creator_id).filter(Boolean))];
@@ -199,7 +199,7 @@
       const publicUrl=sb.storage.from("published-videos").getPublicUrl(v.media_url).data?.publicUrl;
       if(!publicUrl)return "";
       const date=v.created_at?new Date(v.created_at).toLocaleDateString():"";
-      return '<article class="video-empty-card video-published-card"><video controls playsinline preload="metadata" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #29293e;border-radius:13px;background:#080808" src="'+escapeHtml(publicUrl)+'"></video><b>'+escapeHtml(creator.display_name||"Verified creator")+'</b><small>'+escapeHtml(creator.country||"Community")+(date?" · "+escapeHtml(date):"")+'</small></article>';
+      return '<article class="video-empty-card video-published-card"><video controls playsinline preload="metadata" style="display:block;width:100%;aspect-ratio:16/10;object-fit:cover;border:1px solid #29293e;border-radius:13px;background:#080808" src="'+escapeHtml(publicUrl)+'"></video><b>'+escapeHtml(creator.display_name||"Verified creator")+'</b>'+(v.title?'<p class="tiny">'+escapeHtml(v.title)+'</p>':'')+'<small>'+escapeHtml(creator.country||"Community")+(date?" · "+escapeHtml(date):"")+'</small></article>';
     }).filter(Boolean).join("");
   }
   async function loadCreators(){
@@ -242,11 +242,36 @@
     else if(error)msg("#profileMessage",error.message,true);
     const tiers=await sb.from("adult_subscription_tiers").select("*").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
     $("#tierList").innerHTML=tiers.data?.length?tiers.data.map(t=>'<div class="compact-item"><span>'+escapeHtml(t.tier_name||"Membership")+'</span><b>'+escapeHtml(t.currency||"USD")+' '+((Number(t.price_minor||0)/100).toFixed(2))+'</b></div>').join(""):'<p class="tiny">Your membership tiers will appear here.</p>';
-    const media=await sb.from("adult_creator_media").select("id,media_type,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
-    $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+"Pending review"+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
+    const media=await sb.from("adult_creator_media").select("id,media_type,title,created_at,moderation_status,storage_bucket,media_url").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
+     $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<article class="compact-item" data-creator-media="'+escapeHtml(m.id)+'" style="display:block;padding:14px;margin:10px 0"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>'+escapeHtml(m.media_type||"Media")+'</b><small>'+escapeHtml(m.moderation_status||"Pending")+'</small></div><label style="display:block;margin:10px 0">Video description<textarea data-video-description maxlength="500" rows="2" placeholder="Add a description for your video...">'+escapeHtml(m.title||"")+'</textarea></label><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-outline btn-small" type="button" data-creator-media-action="save">Save description</button><button class="btn btn-outline btn-small" type="button" data-creator-media-action="delete">Delete video</button></div></article>').join(""):'<p class="tiny">No media submissions yet.</p>';
     const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
     const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved — private video submissions are enabled.":"Account review pending — video uploads unlock after age, identity and consent verification and creator approval.";}
   }
+  $("#mediaList").addEventListener("click",async e=>{
+    const button=e.target.closest("button[data-creator-media-action]");if(!button||!currentUser)return;
+    const card=button.closest("[data-creator-media]");if(!card)return;
+    const id=card.dataset.creatorMedia,action=button.dataset.creatorMediaAction;
+    if(action==="save"){
+      const description=card.querySelector("[data-video-description]").value.trim();
+      button.disabled=true;button.textContent="Saving…";
+      const {error}=await sb.from("adult_creator_media").update({title:description||null}).eq("id",id).eq("creator_id",currentUser.id);
+      button.disabled=false;button.textContent="Save description";
+      if(error){msg("#mediaMessage",error.message,true);return;}
+      msg("#mediaMessage","Video description saved.");await loadPublicVideos();return;
+    }
+    if(action==="delete"){
+      if(!window.confirm("Delete this video permanently? This cannot be undone."))return;
+      button.disabled=true;button.textContent="Deleting…";
+      const {data:row,error:lookupError}=await sb.from("adult_creator_media").select("id,media_url,storage_bucket").eq("id",id).eq("creator_id",currentUser.id).maybeSingle();
+      if(lookupError||!row){button.disabled=false;button.textContent="Delete video";msg("#mediaMessage",lookupError?.message||"Video not found.",true);return;}
+      const bucket=row.storage_bucket||"creator-videos";
+      const removed=await sb.storage.from(bucket).remove([row.media_url]);
+      if(removed.error){button.disabled=false;button.textContent="Delete video";msg("#mediaMessage","Could not delete video file: "+removed.error.message,true);return;}
+      const deleted=await sb.from("adult_creator_media").delete().eq("id",id).eq("creator_id",currentUser.id);
+      if(deleted.error){msg("#mediaMessage","The video file was removed, but its record could not be deleted: "+deleted.error.message,true);await loadDashboard();return;}
+      msg("#mediaMessage","Video deleted.");await loadDashboard();await loadPublicVideos();
+    }
+  });
   $("#profileForm").addEventListener("submit",async e=>{
     e.preventDefault();
     const button=e.currentTarget.querySelector('button[type="submit"]');
@@ -290,7 +315,7 @@
     try{
       const upload=await sb.storage.from("creator-videos").upload(path,file,{contentType:file.type,upsert:false});
       if(upload.error)throw upload.error;
-      const saved=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,media_url:path,media_type:"video",consent_confirmed:true});
+      const saved=await sb.from("adult_creator_media").insert({creator_id:currentUser.id,media_url:path,media_type:"video",title:String(f.get("video_description")||"").trim()||null,consent_confirmed:true});
       if(saved.error){await sb.storage.from("creator-videos").remove([path]);throw saved.error;}
       msg("#mediaMessage","Video uploaded privately. It is pending moderation and is not public.");form.reset();await loadDashboard();
     }catch(error){msg("#mediaMessage",error.message||"Upload failed. Please try again.",true);}
