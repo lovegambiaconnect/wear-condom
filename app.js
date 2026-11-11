@@ -116,7 +116,20 @@
   async function loadSession(){
     if(!sb){$('#creatorGrid').innerHTML='<div class="empty-state">The site design is live. Add the Supabase anon key to enable registration, profiles and creator tools.</div>';resolveAuthReady();return;}
     // Subscribe before reading the persisted session so INITIAL_SESSION/auth events cannot be missed.
-    sb.auth.onAuthStateChange((event,session)=>{if(session?.user){currentUser=session.user;updateAuthUI();}else if(event==="SIGNED_OUT"){currentUser=null;updateAuthUI();}});
+
+sb.auth.onAuthStateChange((event, session) => {
+  // Run dashboard/database work outside the Supabase auth callback.
+  setTimeout(() => {
+    if (session?.user) {
+      currentUser = session.user;
+      updateAuthUI();
+    } else if (event === "SIGNED_OUT") {
+      currentUser = null;
+      updateAuthUI();
+    }
+  }, 0);
+});
+
     const {data,error}=await sb.auth.getSession();
     if(error) console.warn('Session restore check:',error.message);
     // Do not overwrite a valid user delivered by the auth listener with a transient null restore result.
