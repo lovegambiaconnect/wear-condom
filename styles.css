@@ -144,3 +144,7 @@ html{scroll-behavior:smooth;background:var(--stream-bg)}body{margin:0;background
 .rail-brand{width:52px;height:52px;margin:0 auto 17px;display:grid;place-items:center;border:1px solid #62304f;border-radius:16px;background:linear-gradient(145deg,#32172d,#171321);color:#ff8bc0;box-shadow:0 8px 25px #ff3f9d20}.rail-brand .condom-logo-icon{width:34px;height:34px}
 .stream-left-rail{justify-content:flex-start}.stream-left-rail .rail-bottom{margin-top:auto}
 @media(max-width:620px){.rail-brand{width:46px;height:46px;margin-bottom:12px}.rail-brand .condom-logo-icon{width:30px;height:30px}}
+
+
+/* Sidebar visibility toggle from the Wear Condom logo */
+@media(min-width:621px){.stream-app.sidebar-collapsed{grid-template-columns:minmax(0,1fr) 320px}.stream-app.sidebar-collapsed .stream-left-rail{display:none}}

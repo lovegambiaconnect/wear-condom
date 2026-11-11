@@ -444,10 +444,35 @@
 
         const appShell = document.querySelector('.stream-app');
         const menuToggle = document.getElementById('menuToggle');
-        menuToggle?.addEventListener('click', () => {
-          const open = appShell?.classList.toggle('menu-open');
-          menuToggle.setAttribute('aria-expanded', String(!!open));
-          menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        const brandToggle = document.querySelector('.stream-brand');
+        const railBrandToggle = document.querySelector('.rail-brand');
+        const isMobileSidebar = () => window.matchMedia('(max-width: 620px)').matches;
+        const setSidebarOpen = open => {
+          if (!appShell) return;
+          if (isMobileSidebar()) {
+            appShell.classList.toggle('menu-open', open);
+          } else {
+            appShell.classList.toggle('sidebar-collapsed', !open);
+          }
+          menuToggle?.setAttribute('aria-expanded', String(open));
+          menuToggle?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          brandToggle?.setAttribute('aria-expanded', String(open));
+          railBrandToggle?.setAttribute('aria-expanded', String(open));
+        };
+        const toggleSidebar = () => {
+          const open = isMobileSidebar()
+            ? !appShell?.classList.contains('menu-open')
+            : appShell?.classList.contains('sidebar-collapsed');
+          setSidebarOpen(!!open);
+        };
+        menuToggle?.addEventListener('click', toggleSidebar);
+        brandToggle?.addEventListener('click', event => {
+          event.preventDefault();
+          toggleSidebar();
+        });
+        railBrandToggle?.addEventListener('click', event => {
+          event.preventDefault();
+          toggleSidebar();
         });
         const railLinks = [...document.querySelectorAll('.rail-nav a.rail-link')];
         const settingsButton = document.getElementById('openSettings');
@@ -459,6 +484,8 @@
           setRailActive(link.getAttribute('href'));
           appShell?.classList.remove('menu-open');
           menuToggle?.setAttribute('aria-expanded', 'false');
+          brandToggle?.setAttribute('aria-expanded', 'false');
+          railBrandToggle?.setAttribute('aria-expanded', 'false');
         }));
         window.addEventListener('hashchange', () => setRailActive(location.hash || '#home'));
         settingsButton?.addEventListener('click', () => {
@@ -466,6 +493,8 @@
           settingsButton.classList.add('active');
           appShell?.classList.remove('menu-open');
           menuToggle?.setAttribute('aria-expanded', 'false');
+          brandToggle?.setAttribute('aria-expanded', 'false');
+          railBrandToggle?.setAttribute('aria-expanded', 'false');
           document.getElementById('openAuth')?.click();
         });
         const historyKey = 'wear_condom_watch_history_v1';

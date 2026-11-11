@@ -45,7 +45,6 @@
   });
   $("#closeAuth").addEventListener("click",()=>$("#authModal").classList.add("hidden"));
   $$(".auth-tabs button").forEach(b=>b.addEventListener("click",()=>showAuth(b.dataset.mode)));
-  $("#menuToggle").addEventListener("click",()=>$(".stream-app").classList.toggle("menu-open"));
 
   $("#authForm").addEventListener("submit",async e=>{
     e.preventDefault();
