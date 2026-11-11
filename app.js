@@ -39,7 +39,27 @@
 
   function showAuth(mode="signup"){ authMode=mode; $("#authModal").classList.remove("hidden"); $("#authTitle").innerHTML=mode==="signup"?'Create your <em>account.</em>':'Welcome <em>back.</em>'; $("#nameField").classList.toggle("hidden",mode==="signin"); $("#adultConsent").classList.toggle("hidden",mode==="signin"); $("#authSubmit").textContent=mode==="signup"?"Create account":"Sign in"; $$(".auth-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode)); msg("#authMessage",""); $("#authPassword").autocomplete=mode==="signup"?"new-password":"current-password"; }
   ["#openAuth","#joinTop"].forEach(s=>$(s).addEventListener("click",()=>showAuth("signup")));
-  ["#creatorJoin","#videoJoin","#trendingUpload","#trendingUploadBottom"].forEach(selector=>{
+
+["#creatorJoin","#videoJoin","#trendingUpload","#trendingUploadBottom"].forEach(selector => {
+  const button = $(selector);
+  if (!button) return;
+
+  // Upload controls must never submit a form.
+  button.type = "button";
+
+  button.addEventListener("click", async event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!sb) {
+      showAuth("signin");
+      return;
+    }
+
+    await openDashboard();
+  });
+});
+
     const button=$(selector);
     if(button) button.addEventListener("click",event=>{event.preventDefault();openDashboard();});
   });
