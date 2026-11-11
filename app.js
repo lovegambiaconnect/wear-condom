@@ -52,7 +52,7 @@
     if(!sb){msg("#authMessage","Supabase is not connected yet. Add the project's public anon key in config.js.",true);return;}
     const email=$("#authEmail").value.trim(), password=$("#authPassword").value, name=$("#authName").value.trim();
     if(authMode==="signup"&&!$("#adultCheckbox").checked){msg("#authMessage","Please confirm that you are 18 or older.",true);return;}
-    $("#authSubmit").disabled=true; msg("#authMessage",authMode==="signup"?"Creating your account...":"Signing you inâ¦");
+    $("#authSubmit").disabled=true; msg("#authMessage",authMode==="signup"?"Creating your account...":"Signing you in…");
     try{
       let result;
       if(authMode==="signup"){
@@ -93,7 +93,7 @@
     if(!data?.length){host.innerHTML='<div class="empty-state">No creator applications have been submitted yet.</div>';return;}
     host.innerHTML=data.map(p=>{
       const id=escapeHtml(p.id); const ready=p.is_adult_verified&&p.identity_verified&&p.consent_reviewed;
-      return '<article class="admin-creator" data-creator="'+id+'"><div class="admin-creator-head"><div><h3>'+escapeHtml(p.display_name||'Creator')+'</h3><p class="tiny">'+escapeHtml(p.country||'Country not provided')+' Â· Joined '+(p.created_at?new Date(p.created_at).toLocaleDateString():'date unavailable')+'</p><p class="tiny">Account ID: '+id.slice(0,8)+'â¦</p></div><span class="admin-status">'+escapeHtml(p.moderation_status||'pending')+'</span></div><div class="admin-checks"><label><input type="checkbox" data-field="is_adult_verified" '+(p.is_adult_verified?'checked':'')+'> Age evidence reviewed</label><label><input type="checkbox" data-field="identity_verified" '+(p.identity_verified?'checked':'')+'> Identity evidence reviewed</label><label><input type="checkbox" data-field="consent_reviewed" '+(p.consent_reviewed?'checked':'')+'> Consent evidence reviewed</label></div><p class="tiny">Approval requires all three checks. Only mark a check after completing the relevant evidence review.</p><div class="admin-actions"><button class="btn btn-outline btn-small" data-action="save-checks">Save verification checks</button><button class="btn btn-gold btn-small" data-action="approve" '+(ready?'':'disabled')+'>Approve creator</button><button class="btn btn-outline btn-small" data-action="reject">Reject application</button></div></article>';
+      return '<article class="admin-creator" data-creator="'+id+'"><div class="admin-creator-head"><div><h3>'+escapeHtml(p.display_name||'Creator')+'</h3><p class="tiny">'+escapeHtml(p.country||'Country not provided')+' · Joined '+(p.created_at?new Date(p.created_at).toLocaleDateString():'date unavailable')+'</p><p class="tiny">Account ID: '+id.slice(0,8)+'…</p></div><span class="admin-status">'+escapeHtml(p.moderation_status||'pending')+'</span></div><div class="admin-checks"><label><input type="checkbox" data-field="is_adult_verified" '+(p.is_adult_verified?'checked':'')+'> Age evidence reviewed</label><label><input type="checkbox" data-field="identity_verified" '+(p.identity_verified?'checked':'')+'> Identity evidence reviewed</label><label><input type="checkbox" data-field="consent_reviewed" '+(p.consent_reviewed?'checked':'')+'> Consent evidence reviewed</label></div><p class="tiny">Approval requires all three checks. Only mark a check after completing the relevant evidence review.</p><div class="admin-actions"><button class="btn btn-outline btn-small" data-action="save-checks">Save verification checks</button><button class="btn btn-gold btn-small" data-action="approve" '+(ready?'':'disabled')+'>Approve creator</button><button class="btn btn-outline btn-small" data-action="reject">Reject application</button></div></article>';
     }).join('');
   }
   $("#adminQueue")?.addEventListener("click",async e=>{
@@ -139,7 +139,7 @@
     if(error){console.warn("Could not load approved creator profiles:",error);return;}
     const rows=(data||[]).filter(x=>x.moderation_status==="approved"&&x.is_adult_verified===true&&x.identity_verified===true&&x.consent_reviewed===true);
     if(rows.length){
-      grid.innerHTML=rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>â APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join("");
+      grid.innerHTML=rows.map(p=>'<article class="creator-card"><div class="creator-avatar">'+escapeHtml((p.display_name||"C").slice(0,1).toUpperCase())+'</div><h3>'+escapeHtml(p.display_name||"Creator")+'</h3><p>'+escapeHtml(p.bio||"Independent creator")+'</p><div class="creator-meta"><span>✓ APPROVED</span><span>'+escapeHtml(p.country||"COMMUNITY")+'</span></div></article>').join("");
     }else{
       grid.innerHTML='<div class="empty-state">No approved creator channels yet. Verified creators will appear here after review.</div>';
     }
@@ -176,7 +176,7 @@
     const media=await sb.from("adult_creator_media").select("id,media_type,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
     $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+"Pending review"+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
     const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
-    const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved â private video submissions are enabled.":"Account review pending â video uploads unlock after age, identity and consent verification and creator approval.";}
+    const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved — private video submissions are enabled.":"Account review pending — video uploads unlock after age, identity and consent verification and creator approval.";}
   }
   $("#profileForm").addEventListener("submit",async e=>{
     e.preventDefault();
@@ -184,7 +184,7 @@
     if(!sb||!currentUser){msg("#profileMessage","Please sign in again before saving your profile.",true);return;}
     const row={id:currentUser.id,display_name:$("#displayName").value.trim(),bio:$("#bio").value.trim(),country:$("#country").value.trim()};
     if(!row.display_name){msg("#profileMessage","Please enter a display name.",true);return;}
-    button.disabled=true;button.textContent="Savingâ¦";msg("#profileMessage","Saving your profileâ¦");
+    button.disabled=true;button.textContent="Saving…";msg("#profileMessage","Saving your profile…");
     try{
       const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
       if(error) throw error;
@@ -217,7 +217,7 @@
     }
     const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-100);
     const path=currentUser.id+"/"+Date.now()+"-"+safeName;
-    const button=form.querySelector('button[type="submit"]');button.disabled=true;button.textContent="Uploadingâ¦";
+    const button=form.querySelector('button[type="submit"]');button.disabled=true;button.textContent="Uploading…";
     try{
       const upload=await sb.storage.from("creator-videos").upload(path,file,{contentType:file.type,upsert:false});
       if(upload.error)throw upload.error;
