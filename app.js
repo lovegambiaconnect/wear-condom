@@ -393,6 +393,7 @@
       const {error}=await sb.from("adult_creator_profiles").upsert(row,{onConflict:"id"});
       if(error) throw error;
       msg("#profileMessage","Profile saved successfully. It will appear publicly after review.");
+      $("#profileDetails").open=false;
       await loadCreators();
     }catch(error){
       console.error("Profile save failed:",error);
