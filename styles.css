@@ -43,7 +43,6 @@ h1 em,h2 em{color:var(--gold2);font-style:normal}
 .dashboard{padding-top:28px;padding-bottom:48px;border-top:1px solid var(--line)}
 .dashboard-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
 .dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;max-width:620px}
-.dashboard-grid>.panel:nth-child(n+2){display:none}
 .panel input,.panel textarea,.panel select,.modal input{display:block;width:100%;margin-top:6px;padding:11px;border:1px solid #51432c;border-radius:6px;background:#080808;color:var(--white)}
 .panel label,.modal label{display:block;margin:14px 0;color:#e6ddca;font-size:14px}
 .panel button{margin-top:8px}.check-line{display:flex!important;align-items:flex-start;gap:9px}.check-line input{width:auto;accent-color:var(--gold);margin-top:5px}
