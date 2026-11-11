@@ -316,13 +316,15 @@
     host.innerHTML='<p class="tiny">Loading membership plans…</p>';
     const [plansResult,membershipResult]=await Promise.all([
       sb.from("wear_membership_plans").select("id,plan_code,plan_name,duration_days,price_gmd,currency").eq("is_active",true).order("price_gmd",{ascending:true}),
-      sb.from("wear_active_memberships").select("status,expires_at").eq("user_id",currentUser.id).eq("status","active").maybeSingle()
+      sb.from("wear_active_memberships").select("status,starts_at,expires_at").eq("user_id",currentUser.id).eq("status","active").lte("starts_at",new Date().toISOString()).gt("expires_at",new Date().toISOString()).maybeSingle()
     ]);
     if(plansResult.error){host.innerHTML='<p class="tiny">Membership plans could not be loaded. Please refresh and try again.</p>';msg("#membershipMessage",plansResult.error.message,true);return;}
     const active=membershipResult.data;
+    const uploadButton=$("#mediaForm button[type=\"submit\"]");
+    if(uploadButton)uploadButton.disabled=!active||!!membershipResult.error;
     const statusLine=active?.expires_at
-      ? '<p class="tiny">Your membership is active until '+escapeHtml(new Date(active.expires_at).toLocaleDateString())+'. You can extend it with another plan below.</p>'
-      : '<p class="tiny muted">Choose a plan to continue to secure payment with Modem Pay.</p>';
+      ? '<p class="tiny">Your membership is active until '+escapeHtml(new Date(active.expires_at).toLocaleDateString())+'. You can extend it with another plan below.</p><p class="tiny muted">Creator uploads are unlocked while your membership is active. Watching approved videos is free.</p>'
+      : '<p class="tiny muted">An active paid membership is required to upload videos. Watching approved videos remains free.</p><p class="tiny muted">Choose a plan to continue to secure payment with Modem Pay.</p>';
     const plans=plansResult.data||[];
     host.innerHTML=statusLine+(plans.length?plans.map(plan=>{
       const amount=Number(plan.price_gmd).toLocaleString("en-GM");
@@ -412,6 +414,10 @@
     if(!allowed.includes(file.type)){msg("#mediaMessage","Please choose an MP4, WebM or MOV video.",true);return;}
     if(file.size>50*1024*1024){msg("#mediaMessage","This file is larger than 50 MB. Please choose a smaller video.",true);return;}
     if(f.get("consent")!=="on"){msg("#mediaMessage","Confirm ownership and documented consent before uploading.",true);return;}
+    const membershipNow=new Date().toISOString();
+    const {data:membership,error:membershipError}=await sb.from("wear_active_memberships").select("status,starts_at,expires_at").eq("user_id",currentUser.id).eq("status","active").lte("starts_at",membershipNow).gt("expires_at",membershipNow).maybeSingle();
+    if(membershipError){msg("#mediaMessage","Could not verify your membership. Please refresh and try again.",true);return;}
+    if(!membership){msg("#mediaMessage","An active paid membership is required to upload videos. You can still watch approved videos for free.",true);await loadMembershipPanel();return;}
     const {data:profile,error:profileError}=await sb.from("adult_creator_profiles").select("is_adult_verified,identity_verified,consent_reviewed,moderation_status").eq("id",currentUser.id).maybeSingle();
     if(profileError){msg("#mediaMessage",profileError.message,true);return;}
     if(!profile||profile.is_adult_verified!==true||profile.identity_verified!==true||profile.consent_reviewed!==true||profile.moderation_status!=="approved"){
