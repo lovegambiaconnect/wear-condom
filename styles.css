@@ -148,3 +148,19 @@ html{scroll-behavior:smooth;background:var(--stream-bg)}body{margin:0;background
 
 /* Sidebar visibility toggle from the Wear Condom logo */
 @media(min-width:621px){.stream-app.sidebar-collapsed{grid-template-columns:minmax(0,1fr) 320px}.stream-app.sidebar-collapsed .stream-left-rail{display:none}}
+
+
+/* Wear Condom: always-visible condom toggle and readable navigation drawer */
+.mobile-menu{display:grid!important;place-items:center;flex:0 0 42px;width:42px;height:42px;padding:0;border:1px solid #62304f;border-radius:12px;background:linear-gradient(145deg,#32172d,#171321);color:#ff8bc0;box-shadow:0 0 16px #ff3f9d25;cursor:pointer}
+.mobile-menu .condom-logo-icon{width:30px;height:30px}
+.stream-brand-area{gap:12px}
+.stream-app{grid-template-columns:minmax(0,1fr) 320px}
+.stream-left-rail{position:fixed!important;z-index:60;left:0;top:72px;bottom:0;width:248px;min-height:0;padding:18px 14px;background:#10101c;border-right:1px solid #49304b;box-shadow:16px 0 40px #0009;transform:translateX(-110%);transition:transform .22s ease;overflow-y:auto;justify-content:flex-start}
+.stream-app.menu-open .stream-left-rail{transform:translateX(0)}
+.stream-left-rail .rail-brand{margin:0 0 20px;width:54px;height:54px;align-self:flex-start}
+.stream-left-rail .rail-nav{align-items:stretch;gap:7px;width:100%}
+.stream-left-rail .rail-link{width:100%;min-height:48px;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:0 14px;border-radius:10px;font-size:13px;letter-spacing:.01em}
+.stream-left-rail .rail-link svg{width:20px;height:20px;flex:0 0 20px}
+.stream-left-rail .rail-divider{width:100%;margin:10px 0}
+.stream-left-rail .rail-bottom{margin-top:auto;padding-top:22px;align-items:flex-start;text-align:left;flex-direction:row;gap:12px}
+@media(max-width:620px){.stream-left-rail{top:108px;width:248px}.stream-app{display:block}}
