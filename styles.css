@@ -111,3 +111,24 @@ html{scroll-behavior:smooth;background:var(--stream-bg)}body{margin:0;background
 .live-preview-placeholder span{font-size:30px;color:#ff6b8d}.live-preview-placeholder b{font-size:13px;color:#eee}.live-preview-placeholder small{max-width:240px;font-size:10px;line-height:1.5}
 .live-studio-actions{display:flex;gap:8px;flex-wrap:wrap}.live-studio-actions button{flex:1}.live-studio button:disabled{opacity:.5;cursor:not-allowed}.live-start-disabled{width:100%;opacity:.55;cursor:not-allowed!important}
 @media(min-width:900px){.live-studio-layout{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:start}.live-preview-wrap{min-height:250px}.live-preview-wrap video{min-height:250px}}
+
+
+/* Mobile-friendly offline Live Studio frame */
+@media(max-width:620px){
+  .dashboard-grid .live-studio{width:100%;max-width:none;min-width:0;box-sizing:border-box;padding:14px;}
+  .live-studio-head{gap:8px;align-items:flex-start;}
+  .live-studio-head>div{min-width:0;flex:1;}
+  .live-studio-head .tiny{line-height:1.45;overflow-wrap:anywhere;}
+  .live-status-pill{font-size:8px;padding:6px 8px;white-space:nowrap;}
+  .live-studio-layout{width:100%;min-width:0;grid-template-columns:minmax(0,1fr);gap:12px;}
+  .live-preview-wrap{width:100%;min-width:0;min-height:0;height:auto;aspect-ratio:16/9;}
+  .live-preview-wrap video{width:100%;height:100%;min-height:0;object-fit:cover;}
+  .live-preview-placeholder{padding:12px;gap:6px;}
+  .live-preview-placeholder small{max-width:100%;font-size:10px;}
+  .live-studio-controls{width:100%;min-width:0;display:grid;gap:10px;}
+  .live-studio-controls label{display:block;min-width:0;}
+  .live-studio-controls input,.live-studio-controls textarea,.live-studio-controls select{width:100%;max-width:100%;min-width:0;box-sizing:border-box;}
+  .live-studio-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;}
+  .live-studio-actions button,.live-start-disabled{width:100%;min-width:0;min-height:44px;white-space:normal;}
+  #liveStudioMessage{overflow-wrap:anywhere;line-height:1.5;}
+}
