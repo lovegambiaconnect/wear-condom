@@ -137,7 +137,7 @@
   }
   async function loadAdminQueue(){
     const host=$("#adminQueue"); if(!host)return;
-    const {data,error}=await sb.from("adult_creator_profiles").select("id,display_name,country,created_at,is_adult_verified,identity_verified,consent_reviewed,is_approved,moderation_status").order("created_at",{ascending:false});
+    const {data,error}=await sb.from("adult_creator_profiles").select("id,display_name,country,created_at,is_adult_verified,identity_verified,consent_reviewed,is_approved,moderation_status").eq("moderation_status","pending").eq("is_approved",false).order("created_at",{ascending:false});
     if(error){host.innerHTML='<p class="tiny">Could not load applications: '+escapeHtml(error.message)+'</p>';return;}
     if(!data?.length){host.innerHTML='<div class="empty-state">No creator applications have been submitted yet.</div>';return;}
     host.innerHTML=data.map(p=>{
