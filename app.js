@@ -414,3 +414,4 @@ $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>{
   const requestedAuth = new URLSearchParams(window.location.search).get("auth");
   if (requestedAuth === "signup" || requestedAuth === "signin") showAuth(requestedAuth);
 })();
+ 
