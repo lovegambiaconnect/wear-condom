@@ -349,7 +349,12 @@ sb.auth.onAuthStateChange((event, session) => {
     else if(error)msg("#profileMessage",error.message,true);
     const tiers=await sb.from("adult_subscription_tiers").select("*").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
     $("#tierList").innerHTML=tiers.data?.length?tiers.data.map(t=>'<div class="compact-item"><span>'+escapeHtml(t.tier_name||"Membership")+'</span><b>'+escapeHtml(t.currency||"USD")+' '+((Number(t.price_minor||0)/100).toFixed(2))+'</b></div>').join(""):'<p class="tiny">Your membership tiers will appear here.</p>';
-    const media=await sb.from("adult_creator_media").select("id,media_type,created_at").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
+    const media=await sb.from("adult_creator_media").select("id,media_type,created_at,moderation_status").eq("creator_id",currentUser.id).order("created_at",{ascending:false});
+$("#mediaList").innerHTML=media.data?.length?media.data.map(m=>{
+  const status=m.moderation_status||"pending";
+  const label=status==="approved"?"Approved":status==="rejected"?"Rejected":"Pending review";
+  return '<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+label+'</b></div>';
+}).join(""):'<p class="tiny">No media submissions yet.</p>';
     $("#mediaList").innerHTML=media.data?.length?media.data.map(m=>'<div class="compact-item"><span>'+escapeHtml(m.media_type||"Media")+'</span><b>'+"Pending review"+'</b></div>').join(""):'<p class="tiny">No media submissions yet.</p>';
     const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
     const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved â private video submissions are enabled.":"Account review pending â video uploads unlock after age, identity and consent verification and creator approval.";}
