@@ -211,7 +211,7 @@
 
         msg("#adminMessage","Video rejected. It will not appear in the public library.");
       }
-
+await loadAdminQueue();
       await loadAdminMediaQueue();
       await loadDashboard();
       await loadPublicVideos();
