@@ -238,6 +238,7 @@
   async function loadDashboard(){
     if(!sb||!currentUser)return;
     await loadAdminPanel();
+    await loadMembershipPanel();
     const {data,error}=await sb.from("adult_creator_profiles").select("*").eq("id",currentUser.id).maybeSingle();
     if(data){$("#displayName").value=data.display_name||currentUser.user_metadata?.display_name||"";$("#bio").value=data.bio||"";$("#country").value=data.country||"";}
     else if(error)msg("#profileMessage",error.message,true);
@@ -260,6 +261,50 @@
     const ready=data?.is_adult_verified===true&&data?.identity_verified===true&&data?.consent_reviewed===true&&data?.moderation_status==="approved";
     const review=$("#creatorReviewStatus"); if(review){review.textContent=ready?"Creator checks approved — private video submissions are enabled.":"Account review pending — video uploads unlock after age, identity and consent verification and creator approval.";}
   }
+  async function loadMembershipPanel(){
+    const host=$("#membershipPlans");
+    if(!host||!sb||!currentUser)return;
+    host.innerHTML='<p class="tiny">Loading membership plans…</p>';
+    const [plansResult,membershipResult]=await Promise.all([
+      sb.from("wear_membership_plans").select("id,plan_code,plan_name,duration_days,price_gmd,currency").eq("is_active",true).order("price_gmd",{ascending:true}),
+      sb.from("wear_active_memberships").select("status,expires_at").eq("user_id",currentUser.id).eq("status","active").maybeSingle()
+    ]);
+    if(plansResult.error){host.innerHTML='<p class="tiny">Membership plans could not be loaded. Please refresh and try again.</p>';msg("#membershipMessage",plansResult.error.message,true);return;}
+    const active=membershipResult.data;
+    const statusLine=active?.expires_at
+      ? '<p class="tiny">Your membership is active until '+escapeHtml(new Date(active.expires_at).toLocaleDateString())+'. You can extend it with another plan below.</p>'
+      : '<p class="tiny muted">Choose a plan to continue to secure payment with Modem Pay.</p>';
+    const plans=plansResult.data||[];
+    host.innerHTML=statusLine+(plans.length?plans.map(plan=>{
+      const amount=Number(plan.price_gmd).toLocaleString("en-GM");
+      return '<div class="compact-item" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 0"><div><b>'+escapeHtml(plan.plan_name)+'</b><small class="tiny muted" style="display:block">'+escapeHtml(String(plan.duration_days))+' days of membership</small></div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><b>'+escapeHtml(plan.currency||"GMD")+' '+escapeHtml(amount)+'</b><button class="btn btn-gold btn-small" type="button" data-membership-plan="'+escapeHtml(plan.id)+'">Continue to payment</button></div></div>';
+    }).join(""):'<p class="tiny">No membership plans are available right now.</p>');
+    if(membershipResult.error)msg("#membershipMessage","Your available plans are shown, but current membership status could not be checked.",true);
+    else msg("#membershipMessage","");
+  }
+  $("#membershipPlans").addEventListener("click",async e=>{
+    const button=e.target.closest("button[data-membership-plan]");
+    if(!button)return;
+    if(!sb||!currentUser){showAuth("signin");return;}
+    const originalText=button.textContent;
+    button.disabled=true;button.textContent="Opening payment…";
+    msg("#membershipMessage","Connecting securely to Modem Pay…");
+    try{
+      const {data,error}=await sb.functions.invoke("modem-membership-checkout",{body:{plan_id:button.dataset.membershipPlan}});
+      if(error){
+        let detail=error.message||"Could not start checkout.";
+        try{const response=error.context;if(response&&typeof response.json==="function"){const body=await response.json();detail=body.error||body.message||detail;}}catch(_){}
+        throw new Error(detail);
+      }
+      if(!data?.payment_url)throw new Error("Modem Pay did not return a checkout link. Please try again.");
+      const checkoutUrl=new URL(data.payment_url);
+      if(checkoutUrl.protocol!=="https:")throw new Error("The checkout link is not secure. Please contact support.");
+      window.location.assign(checkoutUrl.toString());
+    }catch(error){
+      msg("#membershipMessage",error.message||"Could not start payment. Please try again.",true);
+      button.disabled=false;button.textContent=originalText;
+    }
+  });
   $("#mediaList").addEventListener("click",async e=>{
     const button=e.target.closest("button[data-creator-media-action]");if(!button||!currentUser)return;
     const card=button.closest("[data-creator-media]");if(!card)return;
